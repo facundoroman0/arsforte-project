@@ -77,8 +77,9 @@
           <td class="font-mono {% if tx.transaction_type == 'income' %}text-primary{% else %}text-secondary{% endif %}">
             {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}${{ tx.amount|floatformat:2 }}
           </td>
-          <td>
-            <a href="{% url 'transactions:update' tx.pk %}" class="btn btn-ghost">Editar</a>
+          <td class="actions-cell">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="openDetailModal({{ tx.pk }})">Detalle</button>
+            <a href="{% url 'transactions:update' tx.pk %}" class="btn btn-ghost btn-sm">Editar</a>
             <form method="post" action="{% url 'transactions:delete' tx.pk %}" class="inline-form">
               {% csrf_token %}
               <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta transacción?')">Eliminar</button>
@@ -96,6 +97,8 @@
   </div>
   {% endif %}
 </main>
+
+{% include 'transactions/modal_detail.html' %}
 
 <style>
 .page-header {
@@ -178,6 +181,12 @@
 .btn-sm {
   padding: var(--space-1) var(--space-2);
   font-size: var(--text-xs);
+}
+
+.actions-cell {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
 }
 
 .empty-state {

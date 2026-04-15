@@ -1,0 +1,358 @@
+{% load static %}
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Detalle de Costo de Oportunidad</h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body" id="modalBody">
+      <div class="loading">Cargando...</div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-4);
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--color-surface);
+  border-radius: 12px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal-header h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: var(--color-text-primary);
+}
+
+.modal-body {
+  padding: var(--space-6);
+}
+
+.modal-footer {
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.loading {
+  text-align: center;
+  padding: var(--space-8);
+  color: var(--color-text-secondary);
+}
+
+.transaction-info {
+  background: var(--color-surface-hover);
+  padding: var(--space-4);
+  border-radius: 8px;
+  margin-bottom: var(--space-6);
+}
+
+.transaction-info h3 {
+  font-size: var(--text-lg);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.transaction-meta {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-6) 0;
+}
+
+.alternative-card {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.alternative-card:last-child {
+  margin-bottom: 0;
+}
+
+.alternative-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  font-weight: 500;
+}
+
+.alternative-icon {
+  font-size: var(--text-lg);
+}
+
+.alternative-values {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.alternative-value {
+  font-size: var(--text-sm);
+}
+
+.alternative-value span {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+}
+
+.alternative-result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3);
+  background: var(--color-surface-hover);
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.gain {
+  color: var(--color-primary);
+}
+
+.loss {
+  color: var(--color-secondary);
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.summary-table th,
+.summary-table td {
+  padding: var(--space-3);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.summary-table th {
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.summary-table td:last-child {
+  text-align: right;
+}
+
+.best-option {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+</style>
+
+<script>
+function openDetailModal(transactionId) {
+  const modal = document.getElementById('detailModal');
+  const body = document.getElementById('modalBody');
+  modal.classList.add('active');
+  body.innerHTML = '<div class="loading">Cargando...</div>';
+  
+  fetch(`/transactions/${transactionId}/detail/`)
+    .then(response => response.json())
+    .then(data => {
+      renderAnalysis(data);
+    })
+    .catch(error => {
+      body.innerHTML = '<p class="error">Error al cargar los datos.</p>';
+    });
+}
+
+function closeModal() {
+  document.getElementById('detailModal').classList.remove('active');
+}
+
+function renderAnalysis(data) {
+  const body = document.getElementById('modalBody');
+  const tx = data.transaction;
+  const analysis = data.analysis;
+  const alts = data.alternatives;
+  
+  const isPesos = tx.instrument === 'Pesos';
+  const sign = tx.type === 'income' ? '+' : '-';
+  
+  let html = `
+    <div class="transaction-info">
+      <h3>${sign}$${parseFloat(tx.amount).toLocaleString('es-AR', {minimumFractionDigits: 2})} en ${tx.instrument}</h3>
+      <div class="transaction-meta">
+        ${tx.date} · ${tx.type === 'income' ? 'Ingreso' : 'Gasto'} · ${tx.category}
+        ${tx.description ? ` · ${tx.description}` : ''}
+      </div>
+    </div>
+  `;
+  
+  if (isPesos && alts) {
+    html += `
+      <div class="alternative-card">
+        <div class="alternative-header">
+          <span class="alternative-icon">💸</span>
+          <span>Valor hoy en pesos</span>
+        </div>
+        <div class="alternative-values">
+          <div class="alternative-value">
+            <strong>$${parseFloat(analysis.value_in_pesos_today).toLocaleString('es-AR', {minimumFractionDigits: 2})}</strong>
+            <span>Poder adquisitivo actual</span>
+          </div>
+          <div class="alternative-value">
+            <strong>-${analysis.inflation_loss_pct.toFixed(1)}%</strong>
+            <span>Pérdida por inflación (${analysis.days_passed} días)</span>
+          </div>
+        </div>
+        <div class="alternative-result loss">
+          <span>Pérdida real</span>
+          <span>-$${parseFloat(analysis.inflation_loss).toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
+        </div>
+      </div>
+    `;
+    
+    if (alts.dollar_blue) {
+      const gainClass = parseFloat(alts.dollar_blue.gain_loss) >= 0 ? 'gain' : 'loss';
+      const gainSign = parseFloat(alts.dollar_blue.gain_loss) >= 0 ? '+' : '';
+      html += `
+        <div class="alternative-card">
+          <div class="alternative-header">
+            <span class="alternative-icon">💵</span>
+            <span>Si hubieras comprado dólar blue</span>
+          </div>
+          <div class="alternative-result ${gainClass}">
+            <span>Valor hoy</span>
+            <span>$${parseFloat(alts.dollar_blue.current_value).toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
+          </div>
+          <div style="text-align: right; margin-top: var(--space-2); font-size: var(--text-sm); color: var(--color-text-secondary);">
+            ${gainSign}$${parseFloat(alts.dollar_blue.gain_loss).toLocaleString('es-AR', {minimumFractionDigits: 2})} (${gainSign}${alts.dollar_blue.percentage.toFixed(1)}%)
+          </div>
+        </div>
+      `;
+    }
+    
+    if (alts.bitcoin) {
+      const gainClass = parseFloat(alts.bitcoin.gain_loss) >= 0 ? 'gain' : 'loss';
+      const gainSign = parseFloat(alts.bitcoin.gain_loss) >= 0 ? '+' : '';
+      html += `
+        <div class="alternative-card">
+          <div class="alternative-header">
+            <span class="alternative-icon">📈</span>
+            <span>Si hubieras comprado Bitcoin</span>
+          </div>
+          <div class="alternative-result ${gainClass}">
+            <span>Valor hoy</span>
+            <span>$${parseFloat(alts.bitcoin.current_value).toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
+          </div>
+          <div style="text-align: right; margin-top: var(--space-2); font-size: var(--text-sm); color: var(--color-text-secondary);">
+            ${gainSign}$${parseFloat(alts.bitcoin.gain_loss).toLocaleString('es-AR', {minimumFractionDigits: 2})} (${gainSign}${alts.bitcoin.percentage.toFixed(1)}%)
+          </div>
+        </div>
+      `;
+    }
+    
+    if (alts.plazo_fijo) {
+      const gainClass = parseFloat(alts.plazo_fijo.gain_loss) >= 0 ? 'gain' : 'loss';
+      const gainSign = parseFloat(alts.plazo_fijo.gain_loss) >= 0 ? '+' : '';
+      html += `
+        <div class="alternative-card">
+          <div class="alternative-header">
+            <span class="alternative-icon">🏦</span>
+            <span>Si hubieras puesto en Plazo Fijo UVA</span>
+          </div>
+          <div class="alternative-result ${gainClass}">
+            <span>Valor hoy</span>
+            <span>$${parseFloat(alts.plazo_fijo.current_value).toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
+          </div>
+          <div style="text-align: right; margin-top: var(--space-2); font-size: var(--text-sm); color: var(--color-text-secondary);">
+            ${gainSign}$${parseFloat(alts.plazo_fijo.gain_loss).toLocaleString('es-AR', {minimumFractionDigits: 2})} (${gainSign}${alts.plazo_fijo.percentage.toFixed(1)}%)
+          </div>
+        </div>
+      `;
+    }
+  } else if (alts) {
+    html += `
+      <div class="alternative-card">
+        <p style="color: var(--color-text-secondary); text-align: center;">
+          Esta transacción ya está en una alternativa (${tx.instrument}).<br>
+          El costo de oportunidad se calculó en relación a mantener el valor en pesos.
+        </p>
+      </div>
+    `;
+  } else {
+    html += `
+      <div class="alternative-card">
+        <p style="color: var(--color-text-secondary); text-align: center;">
+          No hay datos disponibles para calcular el costo de oportunidad.
+        </p>
+      </div>
+    `;
+  }
+  
+  body.innerHTML = html;
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeModal();
+  }
+});
+
+document.querySelector('.modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeModal();
+  }
+});
+</script>
