@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - FinZap{% endblock %}
+
+{% block content %}
+<nav class="navbar">
+  <div class="container navbar-content">
+    <div class="navbar-brand">
+      <span class="text-xl font-bold">FinZap</span>
+    </div>
+    <div class="navbar-actions">
+      <a href="{% url 'transactions:list' %}" class="btn btn-ghost">Transacciones</a>
+      <a href="{% url 'settings' %}" class="btn btn-ghost">Configuración</a>
+      <a href="{% url 'logout' %}" class="btn btn-ghost">Cerrar sesión</a>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+  <div class="dashboard">
+    <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+    
+    <div class="metrics-grid">
+      <div class="card metric-card">
+        <span class="text-sm text-secondary-text">Ingresos del mes</span>
+        <span class="text-2xl font-bold text-primary font-mono">${{ incomes|floatformat:2 }}</span>
+      </div>
+      <div class="card metric-card">
+        <span class="text-sm text-secondary-text">Gastos del mes</span>
+        <span class="text-2xl font-bold text-secondary font-mono">${{ expenses|floatformat:2 }}</span>
+      </div>
+      <div class="card metric-card">
+        <span class="text-sm text-secondary-text">Balance del mes</span>
+        <span class="text-2xl font-bold font-mono {% if balance < 0 %}text-secondary{% else %}text-primary{% endif %}">${{ balance|floatformat:2 }}</span>
+      </div>
+    </div>
+
+    {% if alerts %}
+    {% for alert in alerts %}
+    <div class="alert alert-{{ alert.type }} mt-6">
+      <span class="alert-icon">⚠️</span>
+      <span>{{ alert.message }}</span>
+      <a href="{% url 'settings' %}" class="alert-link">Ajustar umbral</a>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if instrument_distribution %}
+    <div class="card mt-6">
+      <h2 class="text-lg font-semibold mb-4">Distribución por instrumento</h2>
+      <div class="distribution-list">
+        {% for item in instrument_distribution %}
+        <div class="distribution-item">
+          <div class="distribution-label">
+            <span>{{ item.instrument_type|title }}</span>
+            <span class="font-mono">${{ item.total|floatformat:2 }}</span>
+          </div>
+          <div class="distribution-bar">
+            <div class="distribution-fill" style="width: 0%"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if opportunity and opportunity.total_income > 0 %}
+    <div class="card mt-6">
+      <h2 class="text-lg font-semibold mb-4">Costo de Oportunidad</h2>
+      <p class="text-sm text-secondary-text mb-4">Si hubieras invertido tu balance (${{ opportunity.balance|floatformat:2 }}) en lugar de mantenerlo en pesos:</p>
+      <div class="opportunity-grid">
+        <div class="opportunity-item">
+          <span class="text-sm text-secondary-text">Dólar Blue</span>
+          <span class="font-mono {% if opportunity.potential_gain_dollar > 0 %}text-primary{% else %}text-secondary{% endif %}">
+            {% if opportunity.potential_gain_dollar > 0 %}+{% else %}{% endif %}${{ opportunity.potential_gain_dollar|floatformat:2 }}
+          </span>
+        </div>
+        <div class="opportunity-item">
+          <span class="text-sm text-secondary-text">Bitcoin</span>
+          <span class="font-mono {% if opportunity.potential_gain_bitcoin > 0 %}text-primary{% else %}text-secondary{% endif %}">
+            {% if opportunity.potential_gain_bitcoin > 0 %}+{% else %}{% endif %}${{ opportunity.potential_gain_bitcoin|floatformat:2 }}
+          </span>
+        </div>
+        <div class="opportunity-item">
+          <span class="text-sm text-secondary-text">Plazo Fijo UVA</span>
+          <span class="font-mono {% if opportunity.potential_gain_uva > 0 %}text-primary{% else %}text-secondary{% endif %}">
+            {% if opportunity.potential_gain_uva > 0 %}+{% else %}{% endif %}${{ opportunity.potential_gain_uva|floatformat:2 }}
+          </span>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if recent_transactions %}
+    <div class="card mt-6">
+      <h2 class="text-lg font-semibold mb-4">Transacciones recientes</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Categoría</th>
+            <th>Instrumento</th>
+            <th>Monto</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tx in recent_transactions %}
+          <tr>
+            <td>{{ tx.date|date:"d/m" }}</td>
+            <td>
+              <span class="badge badge-{{ tx.transaction_type }}">
+                {% if tx.transaction_type == 'income' %}Ingreso{% else %}Gasto{% endif %}
+              </span>
+            </td>
+            <td>{{ tx.get_category_display }}</td>
+            <td>{{ tx.get_instrument_type_display }}</td>
+            <td class="font-mono {% if tx.transaction_type == 'income' %}text-primary{% else %}text-secondary{% endif %}">
+              {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}${{ tx.amount|floatformat:2 }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="mt-4">
+        <a href="{% url 'transactions:list' %}" class="btn btn-ghost">Ver todas las transacciones →</a>
+      </div>
+    </div>
+    {% else %}
+    <div class="card mt-6 empty-state">
+      <p class="text-secondary-text">No hay transacciones aún.</p>
+      <a href="{% url 'transactions:create' %}" class="btn btn-primary mt-4">Agregar primera transacción</a>
+    </div>
+    {% endif %}
+  </div>
+</main>
+
+<style>
+.navbar {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) 0;
+  margin-bottom: var(--space-6);
+}
+
+.navbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.distribution-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.distribution-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.distribution-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+}
+
+.distribution-bar {
+  height: 8px;
+  background: var(--color-surface-hover);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.distribution-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 4px;
+  transition: width 300ms ease;
+}
+
+.opportunity-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.opportunity-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-surface-hover);
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .opportunity-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table th {
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.badge {
+  padding: var(--space-1) var(--space-2);
+  border-radius: 4px;
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
+.badge-income {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-primary);
+}
+
+.badge-expense {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-secondary);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--space-12);
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: 8px;
+  font-size: var(--text-sm);
+}
+
+.alert-warning {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid var(--color-warning);
+  color: #B45309;
+}
+
+.alert-icon {
+  font-size: var(--text-lg);
+}
+
+.alert-link {
+  margin-left: auto;
+  color: var(--color-warning);
+  text-decoration: underline;
+}
+
+.mb-6 { margin-bottom: var(--space-6); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+</style>
+{% endblock %}

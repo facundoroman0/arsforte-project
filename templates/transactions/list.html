@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Transacciones - FinZap{% endblock %}
+
+{% block content %}
+<nav class="navbar">
+  <div class="container navbar-content">
+    <div class="navbar-brand">
+      <span class="text-xl font-bold">FinZap</span>
+    </div>
+    <div class="navbar-actions">
+      <a href="{% url 'dashboard' %}" class="btn btn-ghost">Dashboard</a>
+      <a href="{% url 'logout' %}" class="btn btn-ghost">Cerrar sesión</a>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+  <div class="page-header">
+    <h1 class="text-2xl font-bold">Transacciones</h1>
+    <a href="{% url 'transactions:create' %}" class="btn btn-primary">Nueva Transacción</a>
+  </div>
+
+  <div class="card filters">
+    <form method="get" class="filters-form">
+      <div class="filter-group">
+        <label>Categoría</label>
+        <select name="category" class="input">
+          <option value="">Todas</option>
+          {% for value, label in categories %}
+          <option value="{{ value }}" {% if filter_category == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Instrumento</label>
+        <select name="instrument" class="input">
+          <option value="">Todos</option>
+          {% for value, label in instruments %}
+          <option value="{{ value }}" {% if filter_instrument == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-group search">
+        <label>Buscar</label>
+        <input type="text" name="search" class="input" placeholder="Buscar..." value="{{ search|default:'' }}">
+      </div>
+      <button type="submit" class="btn btn-secondary">Filtrar</button>
+    </form>
+  </div>
+
+  {% if transactions %}
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Tipo</th>
+          <th>Categoría</th>
+          <th>Instrumento</th>
+          <th>Monto</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tx in transactions %}
+        <tr>
+          <td>{{ tx.date|date:"d/m/Y" }}</td>
+          <td>
+            <span class="badge badge-{{ tx.transaction_type }}">
+              {% if tx.transaction_type == 'income' %}Ingreso{% else %}Gasto{% endif %}
+            </span>
+          </td>
+          <td>{{ tx.get_category_display }}</td>
+          <td>{{ tx.get_instrument_type_display }}</td>
+          <td class="font-mono {% if tx.transaction_type == 'income' %}text-primary{% else %}text-secondary{% endif %}">
+            {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}${{ tx.amount|floatformat:2 }}
+          </td>
+          <td>
+            <a href="{% url 'transactions:update' tx.pk %}" class="btn btn-ghost">Editar</a>
+            <form method="post" action="{% url 'transactions:delete' tx.pk %}" class="inline-form">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta transacción?')">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="card empty-state">
+    <p class="text-secondary-text">No hay transacciones</p>
+    <a href="{% url 'transactions:create' %}" class="btn btn-primary mt-4">Agregar primera transacción</a>
+  </div>
+  {% endif %}
+</main>
+
+<style>
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+}
+
+.filters {
+  margin-bottom: var(--space-4);
+}
+
+.filters-form {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.filter-group.search {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-group label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table th {
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.table tr:hover {
+  background: var(--color-surface-hover);
+}
+
+.badge {
+  padding: var(--space-1) var(--space-2);
+  border-radius: 4px;
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
+.badge-income {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-primary);
+}
+
+.badge-expense {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-secondary);
+}
+
+.inline-form {
+  display: inline;
+}
+
+.btn-sm {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--space-12);
+}
+
+.navbar {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) 0;
+  margin-bottom: var(--space-6);
+}
+
+.navbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.mt-4 { margin-top: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+</style>
+{% endblock %}

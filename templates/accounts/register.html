@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Crear Cuenta - FinZap{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1 class="text-2xl font-bold">FinZap</h1>
+      <p class="text-secondary-text">Crear tu cuenta</p>
+    </div>
+
+    <form method="post" class="auth-form">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label for="id_username">Email</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+        <span class="error">{{ form.username.errors }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="id_password1">Contraseña</label>
+        {{ form.password1 }}
+        {% if form.password1.errors %}
+        <span class="error">{{ form.password1.errors }}</span>
+        {% endif %}
+        <span class="help-text">Mínimo 8 caracteres</span>
+      </div>
+
+      <div class="form-group">
+        <label for="id_password2">Confirmar Contraseña</label>
+        {{ form.password2 }}
+        {% if form.password2.errors %}
+        <span class="error">{{ form.password2.errors }}</span>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-primary auth-btn">
+        Crear Cuenta
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>¿Ya tenés cuenta? <a href="{% url 'login' %}">Iniciar sesión</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

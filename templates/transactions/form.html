@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Transacción - FinZap{% endblock %}
+
+{% block content %}
+<nav class="navbar">
+  <div class="container navbar-content">
+    <div class="navbar-brand">
+      <span class="text-xl font-bold">FinZap</span>
+    </div>
+    <div class="navbar-actions">
+      <a href="{% url 'transactions:list' %}" class="btn btn-ghost">Volver</a>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+  <div class="form-container">
+    <h1 class="text-2xl font-bold mb-6">{{ action }} Transacción</h1>
+
+    <form method="post" class="card form-card">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label>Tipo *</label>
+        <div class="radio-group">
+          {% for value, label in form.transaction_type.field.choices %}
+          <label class="radio-option">
+            <input type="radio" name="transaction_type" value="{{ value }}" {% if form.transaction_type.value == value %}checked{% endif %}>
+            <span>{{ label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        {% if form.transaction_type.errors %}
+        <span class="error">{{ form.transaction_type.errors }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="id_amount">Monto *</label>
+        {{ form.amount }}
+        {% if form.amount.errors %}
+        <span class="error">{{ form.amount.errors }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="id_date">Fecha *</label>
+        {{ form.date }}
+        {% if form.date.errors %}
+        <span class="error">{{ form.date.errors }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="id_category">Categoría *</label>
+        {{ form.category }}
+        {% if form.category.errors %}
+        <span class="error">{{ form.category.errors }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="id_instrument_type">Instrumento *</label>
+        {{ form.instrument_type }}
+        {% if form.instrument_type.errors %}
+        <span class="error">{{ form.instrument_type.errors }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="id_description">Descripción</label>
+        {{ form.description }}
+        {% if form.description.errors %}
+        <span class="error">{{ form.description.errors }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-actions">
+        <a href="{% url 'transactions:list' %}" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary">{{ action }} Transacción</button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<style>
+.form-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.form-group label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.radio-group {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.radio-option input {
+  width: 18px;
+  height: 18px;
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: flex-end;
+  margin-top: var(--space-4);
+}
+
+.error {
+  font-size: var(--text-sm);
+  color: var(--color-secondary);
+}
+
+.navbar {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) 0;
+  margin-bottom: var(--space-6);
+}
+
+.navbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.mb-6 { margin-bottom: var(--space-6); }
+</style>
+{% endblock %}

@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configuración - FinZap{% endblock %}
+
+{% block content %}
+<nav class="navbar">
+  <div class="container navbar-content">
+    <div class="navbar-brand">
+      <span class="text-xl font-bold">FinZap</span>
+    </div>
+    <div class="navbar-actions">
+      <a href="{% url 'dashboard' %}" class="btn btn-ghost">Dashboard</a>
+      <a href="{% url 'logout' %}" class="btn btn-ghost">Cerrar sesión</a>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+  <div class="settings-container">
+    <h1 class="text-2xl font-bold mb-6">Configuración</h1>
+
+    <div class="card">
+      <h2 class="text-lg font-semibold mb-4">Notificaciones</h2>
+      <form method="post" class="settings-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+          <label for="id_threshold">Alerta de riesgo en pesos</label>
+          <p class="text-sm text-secondary-text mb-3">
+            Notificarme cuando el porcentaje en pesos supere:
+          </p>
+          
+          <div class="slider-container">
+            <input 
+              type="range" 
+              name="notification_threshold" 
+              id="id_threshold" 
+              min="10" 
+              max="90" 
+              value="{{ user.notification_threshold }}"
+              class="slider"
+            >
+            <div class="slider-labels">
+              <span>10%</span>
+              <span class="slider-value">{{ user.notification_threshold|floatformat:0 }}%</span>
+              <span>90%</span>
+            </div>
+          </div>
+          
+          <p class="text-sm text-secondary-text mt-2">
+            Preview: "Tenés más del {{ user.notification_threshold|floatformat:0 }}% en pesos"
+          </p>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-4">Guardar cambios</button>
+      </form>
+    </div>
+
+    <div class="card mt-6">
+      <h2 class="text-lg font-semibold mb-4">Datos de cuenta</h2>
+      <div class="info-row">
+        <span class="text-secondary-text">Email:</span>
+        <span>{{ user.email }}</span>
+      </div>
+      <div class="info-row">
+        <span class="text-secondary-text">Miembro desde:</span>
+        <span>{{ user.date_joined|date:"d F Y" }}</span>
+      </div>
+    </div>
+
+    <div class="card mt-6 danger-zone">
+      <h2 class="text-lg font-semibold mb-4 text-secondary">Zona de peligro</h2>
+      <p class="text-sm text-secondary-text mb-4">
+        Esta acción es irreversible. Se eliminarán todos tus datos.
+      </p>
+      <button class="btn btn-danger">Eliminar mi cuenta</button>
+    </div>
+  </div>
+</main>
+
+<style>
+.navbar {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) 0;
+  margin-bottom: var(--space-6);
+}
+
+.navbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.settings-container {
+  max-width: 600px;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.slider-container {
+  padding: var(--space-4) 0;
+}
+
+.slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-surface-hover);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.slider-value {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.danger-zone {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+</style>
+{% endblock %}
