@@ -62,7 +62,11 @@ class TransactionCreateView(LoginRequiredMixin, View):
             transaction.exchange_rate_uva = rates.uva
             
             transaction.save()
-            messages.success(request, 'Transacción creada correctamente')
+            
+            if hasattr(form, 'warning_message'):
+                messages.warning(request, form.warning_message)
+            else:
+                messages.success(request, 'Transacción creada correctamente')
             return redirect('transactions:list')
         context = {'form': form, 'action': 'Crear'}
         return render(request, self.template_name, context)
@@ -86,8 +90,25 @@ class TransactionUpdateView(LoginRequiredMixin, View):
         )
         form = TransactionForm(request.POST, instance=transaction)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Transacción actualizada correctamente')
+            updated_transaction = form.save()
+            
+            new_date = form.cleaned_data['date']
+            if not transaction.exchange_rate_dollar_blue:
+                from services.exchange_rates import get_current_exchange_rates
+                rates = get_current_exchange_rates()
+                updated_transaction.exchange_rate_dollar_blue = rates.dollar_blue
+                updated_transaction.exchange_rate_bitcoin = rates.bitcoin
+                updated_transaction.exchange_rate_uva = rates.uva
+                updated_transaction.save(update_fields=[
+                    'exchange_rate_dollar_blue',
+                    'exchange_rate_bitcoin',
+                    'exchange_rate_uva'
+                ])
+            
+            if hasattr(form, 'warning_message'):
+                messages.warning(request, form.warning_message)
+            else:
+                messages.success(request, 'Transacción actualizada correctamente')
             return redirect('transactions:list')
         context = {'form': form, 'action': 'Editar', 'transaction': transaction}
         return render(request, self.template_name, context)

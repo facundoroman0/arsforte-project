@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static format %}
 
 {% block title %}Transacciones - FinZap{% endblock %}
 
@@ -74,8 +74,8 @@
           </td>
           <td>{{ tx.get_category_display }}</td>
           <td>{{ tx.get_instrument_type_display }}</td>
-          <td class="font-mono {% if tx.transaction_type == 'income' %}text-primary{% else %}text-secondary{% endif %}">
-            {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}${{ tx.amount|floatformat:2 }}
+            <td class="font-mono {% if tx.transaction_type == 'income' %}text-primary{% else %}text-secondary{% endif %}">
+            {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}{{ tx.amount|money }}
           </td>
           <td class="actions-cell">
             <button type="button" class="btn btn-ghost btn-sm" onclick="openDetailModal({{ tx.pk }})">Detalle</button>

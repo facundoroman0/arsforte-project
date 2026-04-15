@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static format %}
 
 {% block title %}Dashboard - FinZap{% endblock %}
 
@@ -24,15 +24,15 @@
     <div class="metrics-grid">
       <div class="card metric-card">
         <span class="text-sm text-secondary-text">Ingresos del mes</span>
-        <span class="text-2xl font-bold text-primary font-mono">${{ incomes|floatformat:2 }}</span>
+        <span class="text-2xl font-bold text-primary font-mono">{{ incomes|money }}</span>
       </div>
       <div class="card metric-card">
         <span class="text-sm text-secondary-text">Gastos del mes</span>
-        <span class="text-2xl font-bold text-secondary font-mono">${{ expenses|floatformat:2 }}</span>
+        <span class="text-2xl font-bold text-secondary font-mono">{{ expenses|money }}</span>
       </div>
       <div class="card metric-card">
         <span class="text-sm text-secondary-text">Balance del mes</span>
-        <span class="text-2xl font-bold font-mono {% if balance < 0 %}text-secondary{% else %}text-primary{% endif %}">${{ balance|floatformat:2 }}</span>
+        <span class="text-2xl font-bold font-mono {% if balance < 0 %}text-secondary{% else %}text-primary{% endif %}">{{ balance|money }}</span>
       </div>
     </div>
 
@@ -54,7 +54,7 @@
         <div class="distribution-item">
           <div class="distribution-label">
             <span>{{ item.instrument_type|title }}</span>
-            <span class="font-mono">${{ item.total|floatformat:2 }}</span>
+            <span class="font-mono">{{ item.total|money }}</span>
           </div>
           <div class="distribution-bar">
             <div class="distribution-fill" style="width: 0%"></div>
@@ -68,24 +68,24 @@
     {% if opportunity and opportunity.balance_in_pesos > 0 %}
     <div class="card mt-6">
       <h2 class="text-lg font-semibold mb-4">Costo de Oportunidad</h2>
-      <p class="text-sm text-secondary-text mb-4">Si hubieras invertido tu balance en pesos (${{ opportunity.balance_in_pesos|floatformat:2 }}) en lugar de mantenerlo:</p>
+      <p class="text-sm text-secondary-text mb-4">Si hubieras invertido tu balance en pesos ({{ opportunity.balance_in_pesos|money }}) en lugar de mantenerlo:</p>
       <div class="opportunity-grid">
         <div class="opportunity-item">
           <span class="text-sm text-secondary-text">Dólar Blue</span>
           <span class="font-mono {% if opportunity.potential_gain_dollar > 0 %}text-primary{% else %}text-secondary{% endif %}">
-            {% if opportunity.potential_gain_dollar > 0 %}+{% else %}{% endif %}${{ opportunity.potential_gain_dollar|floatformat:2 }}
+            {% if opportunity.potential_gain_dollar > 0 %}+{% endif %}{{ opportunity.potential_gain_dollar|money }}
           </span>
         </div>
         <div class="opportunity-item">
           <span class="text-sm text-secondary-text">Bitcoin</span>
           <span class="font-mono {% if opportunity.potential_gain_bitcoin > 0 %}text-primary{% else %}text-secondary{% endif %}">
-            {% if opportunity.potential_gain_bitcoin > 0 %}+{% else %}{% endif %}${{ opportunity.potential_gain_bitcoin|floatformat:2 }}
+            {% if opportunity.potential_gain_bitcoin > 0 %}+{% endif %}{{ opportunity.potential_gain_bitcoin|money }}
           </span>
         </div>
         <div class="opportunity-item">
           <span class="text-sm text-secondary-text">Plazo Fijo UVA</span>
           <span class="font-mono {% if opportunity.potential_gain_uva > 0 %}text-primary{% else %}text-secondary{% endif %}">
-            {% if opportunity.potential_gain_uva > 0 %}+{% else %}{% endif %}${{ opportunity.potential_gain_uva|floatformat:2 }}
+            {% if opportunity.potential_gain_uva > 0 %}+{% endif %}{{ opportunity.potential_gain_uva|money }}
           </span>
         </div>
       </div>
@@ -117,7 +117,7 @@
             <td>{{ tx.get_category_display }}</td>
             <td>{{ tx.get_instrument_type_display }}</td>
             <td class="font-mono {% if tx.transaction_type == 'income' %}text-primary{% else %}text-secondary{% endif %}">
-              {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}${{ tx.amount|floatformat:2 }}
+              {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}{{ tx.amount|money }}
             </td>
           </tr>
           {% endfor %}
