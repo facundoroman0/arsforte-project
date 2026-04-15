@@ -225,37 +225,57 @@ def analyze_transaction(
     
     # Dólar Blue: cuánto hubiera ganado si compraba dólares
     # Fórmula: pesos / precio_dólar_entonces × precio_dólar_hoy
+    # Si no hay rate histórico, usa el actual como aproximación
     dollar_blue_value = None
-    if blue_rate and blue_rate.buy > 0 and exchange_rate_dollar_blue:
+    if blue_rate and blue_rate.buy > 0:
+        if exchange_rate_dollar_blue:
+            start_rate = float(exchange_rate_dollar_blue)
+            details = f'Dólar entonces: ${exchange_rate_dollar_blue:,.0f} → hoy: ${blue_rate.buy:,.0f}'
+        else:
+            start_rate = blue_rate.buy
+            details = f'Dólar aprox: ${blue_rate.buy:,.0f} (sin datos históricos)'
+        
         dollar_blue_value = calculate_opportunity_cost(
             original_amount=amount,
-            start_rate=float(exchange_rate_dollar_blue),
+            start_rate=start_rate,
             current_rate=blue_rate.buy,
             instrument_name='Dólar Blue',
-            details=f'Dólar entonces: ${exchange_rate_dollar_blue:,.0f} → hoy: ${blue_rate.buy:,.0f}'
+            details=details
         )
     
     # Bitcoin: cuánto hubiera ganado si compraba BTC
     # Fórmula: pesos / btc_entonces × btc_hoy
     bitcoin_value = None
-    if bitcoin_price and bitcoin_price.price_ars > 0 and exchange_rate_bitcoin:
+    if bitcoin_price and bitcoin_price.price_ars > 0:
+        if exchange_rate_bitcoin:
+            start_rate = float(exchange_rate_bitcoin)
+            details = f'BTC entonces: ${exchange_rate_bitcoin:,.0f} → hoy: ${bitcoin_price.price_ars:,.0f}'
+        else:
+            start_rate = bitcoin_price.price_ars
+            details = f'BTC aprox: ${bitcoin_price.price_ars:,.0f} (sin datos históricos)'
+        
         bitcoin_value = calculate_opportunity_cost(
             original_amount=amount,
-            start_rate=float(exchange_rate_bitcoin),
+            start_rate=start_rate,
             current_rate=bitcoin_price.price_ars,
             instrument_name='Bitcoin',
-            details=f'BTC entonces: ${exchange_rate_bitcoin:,.0f} → hoy: ${bitcoin_price.price_ars:,.0f}'
+            details=details
         )
     
     # Plazo Fijo UVA: interés compuesto sobre UVAs
     # Fórmula: monto × (1 + tasa_mensual)^meses
     plazo_fijo_value = None
-    if uva_data and exchange_rate_uva:
+    if uva_data:
         monthly_rate = uva_data.nominal_rate / 12
         months_decimal = days_diff / 30
         current_value = amount * Decimal(str((1 + monthly_rate) ** months_decimal))
         gain_loss = current_value - amount
         percentage = (float(current_value) / float(amount) - 1) * 100
+        
+        if exchange_rate_uva:
+            details = f'UVA entonces: ${exchange_rate_uva:,.0f} → hoy: ${uva_data.uva_price:,.0f}'
+        else:
+            details = f'UVA aprox: ${uva_data.uva_price:,.0f} (sin datos históricos)'
         
         plazo_fijo_value = OpportunityCost(
             original_amount=amount,
@@ -263,7 +283,7 @@ def analyze_transaction(
             gain_loss=gain_loss,
             percentage=percentage,
             instrument='Plazo Fijo UVA',
-            details=f'UVA entonces: ${exchange_rate_uva:,.0f} → hoy: ${uva_data.uva_price:,.0f}'
+            details=details
         )
     
     inflation_loss = amount - value_in_pesos_today
