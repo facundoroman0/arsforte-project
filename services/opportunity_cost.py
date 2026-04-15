@@ -313,11 +313,23 @@ def get_total_opportunity_cost(user, month_start) -> dict:
     total_expense = sum((tx.amount for tx in expenses), Decimal('0'))
     balance = total_income - total_expense
     
+    # Calcula balance en pesos (neto de ingresos y gastos en pesos)
+    pesos_income = sum(
+        (tx.amount for tx in incomes if tx.instrument_type == 'pesos'),
+        Decimal('0')
+    )
+    pesos_expense = sum(
+        (tx.amount for tx in expenses if tx.instrument_type == 'pesos'),
+        Decimal('0')
+    )
+    balance_in_pesos = max(pesos_income - pesos_expense, Decimal('0'))
+    
     if balance <= 0:
         return {
             'total_income': total_income,
             'total_expense': total_expense,
             'balance': balance,
+            'balance_in_pesos': balance_in_pesos,
             'potential_gain_dollar': Decimal('0'),
             'potential_gain_bitcoin': Decimal('0'),
             'potential_gain_uva': Decimal('0'),
@@ -355,6 +367,7 @@ def get_total_opportunity_cost(user, month_start) -> dict:
         'total_income': total_income,
         'total_expense': total_expense,
         'balance': balance,
+        'balance_in_pesos': balance_in_pesos,
         'potential_gain_dollar': total_dollar_gain,
         'potential_gain_bitcoin': total_bitcoin_gain,
         'potential_gain_uva': total_uva_gain,

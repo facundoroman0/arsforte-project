@@ -65,10 +65,10 @@
     </div>
     {% endif %}
 
-    {% if opportunity and opportunity.total_income > 0 %}
+    {% if opportunity and opportunity.balance_in_pesos > 0 %}
     <div class="card mt-6">
       <h2 class="text-lg font-semibold mb-4">Costo de Oportunidad</h2>
-      <p class="text-sm text-secondary-text mb-4">Si hubieras invertido tu balance (${{ opportunity.balance|floatformat:2 }}) en lugar de mantenerlo en pesos:</p>
+      <p class="text-sm text-secondary-text mb-4">Si hubieras invertido tu balance en pesos (${{ opportunity.balance_in_pesos|floatformat:2 }}) en lugar de mantenerlo:</p>
       <div class="opportunity-grid">
         <div class="opportunity-item">
           <span class="text-sm text-secondary-text">Dólar Blue</span>
