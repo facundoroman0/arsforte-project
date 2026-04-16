@@ -1,7 +1,13 @@
+"""
+Servicio para obtener el precio de Bitcoin desde CoinGecko.
+"""
+import logging
 import requests
 from dataclasses import dataclass
 from typing import Optional
 from .cache import cached
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -33,8 +39,16 @@ class CoinGeckoService:
                     price_usd=btc.get('usd', 0),
                     source='coingecko'
                 )
-        except Exception:
-            pass
+            else:
+                logger.warning(
+                    f'CoinGecko API returned status {response.status_code}'
+                )
+        except requests.Timeout:
+            logger.error('CoinGecko API request timed out')
+        except requests.ConnectionError as e:
+            logger.error(f'CoinGecko API connection error: {e}')
+        except Exception as e:
+            logger.error(f'CoinGecko API unexpected error: {e}')
         return None
 
 

@@ -4,3 +4,4 @@ from .inflation import inflation_service, InflationData
 from .bcra import bcra_service, UVAData
 from .cache import cached
 from . import opportunity_cost
+from . import api_status

@@ -92,8 +92,20 @@
   </div>
   {% else %}
   <div class="card empty-state">
-    <p class="text-secondary-text">No hay transacciones</p>
+    <div class="empty-state-icon">💸</div>
+    <h3 class="empty-state-title">No hay transacciones</h3>
+    <p class="text-secondary-text">
+      {% if filter_category or filter_instrument or search %}
+        No se encontraron transacciones con los filtros aplicados.
+      {% else %}
+        Registrá tu primera transacción para empezar a trackear tus finanzas.
+      {% endif %}
+    </p>
+    {% if not filter_category and not filter_instrument and not search %}
     <a href="{% url 'transactions:create' %}" class="btn btn-primary mt-4">Agregar primera transacción</a>
+    {% else %}
+    <a href="{% url 'transactions:list' %}" class="btn btn-secondary mt-4">Limpiar filtros</a>
+    {% endif %}
   </div>
   {% endif %}
 </main>
@@ -192,6 +204,17 @@
 .empty-state {
   text-align: center;
   padding: var(--space-12);
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: var(--space-4);
+}
+
+.empty-state-title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
 }
 
 .navbar {

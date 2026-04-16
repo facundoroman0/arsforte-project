@@ -7,6 +7,7 @@ from datetime import date
 from transactions.models import Transaction, TransactionType
 from services import opportunity_cost
 from services.alerts import get_user_alerts
+from services.api_status import get_apis_status
 
 
 class DashboardView(LoginRequiredMixin, View):
@@ -47,6 +48,7 @@ class DashboardView(LoginRequiredMixin, View):
         )
         
         alerts = get_user_alerts(request.user)
+        apis_status = get_apis_status()
         
         context = {
             'incomes': incomes,
@@ -56,5 +58,6 @@ class DashboardView(LoginRequiredMixin, View):
             'recent_transactions': recent_transactions,
             'opportunity': opportunity,
             'alerts': alerts,
+            'apis_status': apis_status,
         }
         return render(request, self.template_name, context)
