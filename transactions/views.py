@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
@@ -162,7 +164,7 @@ class TransactionDetailView(LoginRequiredMixin, View):
                 'value_in_pesos_today': str(analysis.value_in_pesos_today),
                 'inflation_loss': str(analysis.inflation_loss),
                 'inflation_loss_pct': analysis.inflation_loss_pct,
-                'days_passed': (transaction.date.today() - transaction.date).days,
+                'days_passed': (date.today() - transaction.date).days,
             },
             'alternatives': {
                 'dollar_blue': self._format_opportunity(analysis.dollar_blue_value),
