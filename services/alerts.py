@@ -1,5 +1,5 @@
 """
-Módulo de alertas para FinZap.
+Módulo de alertas para ArsForte.
 
 Genera alertas para notificar al usuario sobre riesgos en su distribución
 de instrumentos financieros.

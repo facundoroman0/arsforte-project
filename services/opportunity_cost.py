@@ -1,5 +1,5 @@
 """
-Módulo de cálculo de costo de oportunidad para FinZap.
+Módulo de cálculo de costo de oportunidad para ArsForte.
 
 Calcula cuánto habría rendido el dinero del usuario si lo hubiera invertido
 en lugar de mantenerlo en pesos. Compara con:
