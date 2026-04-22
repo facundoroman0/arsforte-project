@@ -21,8 +21,8 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls')),
+    path('users/', include('users.urls')),
     path('transactions/', include('transactions.urls', namespace='transactions')),
     path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
-    path('', RedirectView.as_view(url='/accounts/login/', permanent=False), name='home'),
+    path('', RedirectView.as_view(url='/users/login/', permanent=False), name='home'),
 ]

@@ -13,7 +13,7 @@ User = get_user_model()
 
 
 class LoginView(View):
-    template_name = 'accounts/login.html'
+    template_name = 'users/login.html'
 
     def get(self, request):
         if request.user.is_authenticated:
@@ -39,7 +39,7 @@ class LogoutView(View):
 
 
 class RegisterView(View):
-    template_name = 'accounts/register.html'
+    template_name = 'users/register.html'
 
     def get(self, request):
         if request.user.is_authenticated:
