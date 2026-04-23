@@ -5,3 +5,4 @@ from .bcra import bcra_service, UVAData
 from .cache import cached
 from . import opportunity_cost
 from . import api_status
+from . import historical_rates

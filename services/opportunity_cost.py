@@ -20,6 +20,7 @@ from services import (
     coingecko_service,
     inflation_service,
     bcra_service,
+    historical_rates,
 )
 
 
@@ -391,4 +392,100 @@ def get_total_opportunity_cost(user, month_start) -> dict:
         'potential_gain_dollar': total_dollar_gain,
         'potential_gain_bitcoin': total_bitcoin_gain,
         'potential_gain_uva': total_uva_gain,
+    }
+
+
+def get_purchasing_power_analysis(
+    user,
+    start_date: date,
+    end_date: date
+) -> dict:
+    """
+    Analiza el poder adquisitivo del usuario desde start_date hasta end_date.
+
+    Calcula:
+    - Pérdida por inflación sobre ingresos en pesos
+    - Ganancia potencial si hubiera dolarizado
+    - Ganancia potencial si hubiera hecho Plazo Fijo UVA
+
+    Args:
+        user: Usuario a analizar.
+        start_date: Fecha de inicio del período.
+        end_date: Fecha de fin del período.
+
+    Returns:
+        Dict con análisis de poder adquisitivo.
+    """
+    from transactions.models import Transaction, TransactionType
+
+    incomes = Transaction.objects.filter(
+        user=user,
+        date__gte=start_date,
+        date__lte=end_date,
+        transaction_type=TransactionType.INCOME
+    )
+    total_income = sum((tx.amount for tx in incomes), Decimal('0'))
+
+    if total_income <= 0:
+        return {
+            'total_income': Decimal('0'),
+            'start_date': start_date,
+            'end_date': end_date,
+            'inflation_loss_pct': 0.0,
+            'inflation_loss_amount': Decimal('0'),
+            'dollar_gain_pct': 0.0,
+            'dollar_gain_amount': Decimal('0'),
+            'uva_gain_pct': 0.0,
+            'uva_gain_amount': Decimal('0'),
+        }
+
+    historical = historical_rates.historical_rates_service
+    inflation = inflation_service.get_inflation()
+    uva_data = bcra_service.get_uva_data()
+
+    months_diff = max(1, (end_date - start_date).days / 30)
+
+    start_blue = historical.get_blue_rate(start_date)
+    current_blue = bluelytics_service.get_blue_rate()
+    start_uva = historical.get_uva_rate(start_date)
+    start_btc = historical.get_btc_price(start_date)
+    current_btc = coingecko_service.get_bitcoin_price()
+
+    inflation_loss_pct = 0.0
+    inflation_loss_amount = Decimal('0')
+    if inflation:
+        inflation_loss_pct = ((1 + inflation.monthly_rate) ** months_diff - 1) * 100
+        inflation_loss_amount = total_income * Decimal(str(inflation_loss_pct / 100))
+
+    dollar_gain_pct = 0.0
+    dollar_gain_amount = Decimal('0')
+    if start_blue and current_blue and current_blue.buy > 0:
+        start_rate = float(start_blue.value)
+        current_rate = current_blue.buy
+        if start_rate > 0:
+            dollar_gain_pct = (current_rate / start_rate - 1) * 100
+            dollar_gain_amount = total_income * Decimal(str(dollar_gain_pct / 100))
+
+    uva_gain_pct = 0.0
+    uva_gain_amount = Decimal('0')
+    if start_uva and uva_data:
+        start_uva_value = float(start_uva.value)
+        current_uva_value = uva_data.uva_price
+        monthly_rate = uva_data.nominal_rate / 12
+        if start_uva_value > 0:
+            theoretical_uva_gain = float(total_income) * ((1 + monthly_rate) ** months_diff - 1)
+            actual_rate_change = (current_uva_value / start_uva_value - 1)
+            uva_gain_pct = actual_rate_change * 100
+            uva_gain_amount = Decimal(str(uva_gain_pct / 100)) * total_income
+
+    return {
+        'total_income': total_income,
+        'start_date': start_date,
+        'end_date': end_date,
+        'inflation_loss_pct': round(inflation_loss_pct, 2),
+        'inflation_loss_amount': abs(inflation_loss_amount),
+        'dollar_gain_pct': round(dollar_gain_pct, 2),
+        'dollar_gain_amount': max(dollar_gain_amount, Decimal('0')),
+        'uva_gain_pct': round(uva_gain_pct, 2),
+        'uva_gain_amount': max(uva_gain_amount, Decimal('0')),
     }

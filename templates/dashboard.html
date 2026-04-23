@@ -56,7 +56,7 @@
     </div>
     {% endif %}
 
-    {% if instrument_distribution %}
+    {% comment %} {% if instrument_distribution %}
     <div class="card mt-6">
       <h2 class="text-lg font-semibold mb-4">Distribución por instrumento</h2>
       <div class="distribution-list">
@@ -71,6 +71,29 @@
           </div>
         </div>
         {% endfor %}
+      </div>
+    </div>
+    {% endif %} {% endcomment %}
+
+    {% if purchasing_power and purchasing_power.total_income > 0 %}
+    <div class="card mt-6 purchasing-power-card">
+      <div class="purchasing-power-header">
+        <h2 class="text-lg font-semibold">Tu poder adquisitivo real</h2>
+        <span class="period-badge">{{ purchasing_power.start_date|date:"d/m" }} → hoy</span>
+      </div>
+      <div class="purchasing-power-content">
+        <div class="power-metric power-loss">
+          <span class="power-metric-label">En pesos</span>
+          <span class="power-metric-value text-secondary">-{{ purchasing_power.inflation_loss_pct|floatformat:1 }}%</span>
+        </div>
+        <div class="power-metric power-gain">
+          <span class="power-metric-label">Si dolarizaras</span>
+          <span class="power-metric-value text-primary">+{{ purchasing_power.dollar_gain_pct|floatformat:1 }}%</span>
+        </div>
+        <div class="power-metric power-gain">
+          <span class="power-metric-label">Si PF UVA</span>
+          <span class="power-metric-value text-primary">+{{ purchasing_power.uva_gain_pct|floatformat:1 }}%</span>
+        </div>
       </div>
     </div>
     {% endif %}
@@ -340,6 +363,68 @@
 .api-error {
   background: rgba(239, 68, 68, 0.1);
   color: var(--color-secondary);
+}
+
+.purchasing-power-card {
+  background: linear-gradient(135deg, var(--color-surface) 0%, rgba(16, 185, 129, 0.05) 100%);
+  border: 1px solid var(--color-primary);
+}
+
+.purchasing-power-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+.period-badge {
+  font-size: var(--text-xs);
+  padding: var(--space-1) var(--space-2);
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-primary);
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.purchasing-power-content {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.power-metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-surface-hover);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.power-metric-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.power-metric-value {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.power-loss {
+  border-left: 3px solid var(--color-secondary);
+}
+
+.power-gain {
+  border-left: 3px solid var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .purchasing-power-content {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
 {% endblock %}

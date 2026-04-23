@@ -10,6 +10,11 @@ from services.alerts import get_user_alerts
 from services.api_status import get_apis_status
 
 
+def get_year_start() -> date:
+    today = date.today()
+    return date(today.year, 1, 1)
+
+
 class DashboardView(LoginRequiredMixin, View):
     template_name = 'dashboard.html'
     login_url = 'login'
@@ -17,6 +22,7 @@ class DashboardView(LoginRequiredMixin, View):
     def get(self, request):
         today = date.today()
         month_start = today.replace(day=1)
+        year_start = get_year_start()
         
         transactions = Transaction.objects.filter(user=request.user)
         month_transactions = transactions.filter(date__gte=month_start)
@@ -47,6 +53,10 @@ class DashboardView(LoginRequiredMixin, View):
             request.user, month_start
         )
         
+        purchasing_power = opportunity_cost.get_purchasing_power_analysis(
+            request.user, year_start, today
+        )
+        
         alerts = get_user_alerts(request.user)
         apis_status = get_apis_status()
         
@@ -57,6 +67,7 @@ class DashboardView(LoginRequiredMixin, View):
             'instrument_distribution': instrument_distribution,
             'recent_transactions': recent_transactions,
             'opportunity': opportunity,
+            'purchasing_power': purchasing_power,
             'alerts': alerts,
             'apis_status': apis_status,
         }
