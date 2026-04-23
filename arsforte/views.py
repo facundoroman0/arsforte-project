@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.db.models import Sum
 from decimal import Decimal
-from datetime import date
+from datetime import date, timedelta
 from transactions.models import Transaction, TransactionType
 from services import opportunity_cost, bluelytics_service
 from services.alerts import get_user_alerts
@@ -13,6 +13,13 @@ from services.api_status import get_apis_status
 def get_year_start() -> date:
     today = date.today()
     return date(today.year, 1, 1)
+
+
+def get_month_summary(transactions, start_date, end_date, transaction_type=None):
+    filtered = transactions.filter(date__gte=start_date, date__lte=end_date)
+    if transaction_type:
+        filtered = filtered.filter(transaction_type=transaction_type)
+    return filtered.aggregate(total=Sum('amount'))['total'] or Decimal('0')
 
 
 def calculate_usd_values(incomes: Decimal, expenses: Decimal, balance: Decimal, rate: Decimal) -> dict:
@@ -35,7 +42,7 @@ class DashboardView(LoginRequiredMixin, View):
         year_start = get_year_start()
         
         transactions = Transaction.objects.filter(user=request.user)
-        month_transactions = transactions.filter(date__gte=month_start)
+        month_transactions = transactions.filter(date__gte=month_start, date__lte=today)
         
         incomes = month_transactions.filter(
             transaction_type=TransactionType.INCOME
@@ -46,6 +53,24 @@ class DashboardView(LoginRequiredMixin, View):
         ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
         
         balance = incomes - expenses
+        
+        last_day_prev = month_start - timedelta(days=1)
+        first_day_prev = last_day_prev.replace(day=1)
+        
+        prev_month_transactions = transactions.filter(
+            date__gte=first_day_prev,
+            date__lt=month_start
+        )
+        
+        prev_incomes = prev_month_transactions.filter(
+            transaction_type=TransactionType.INCOME
+        ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
+        
+        prev_expenses = prev_month_transactions.filter(
+            transaction_type=TransactionType.EXPENSE
+        ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
+        
+        prev_balance = prev_incomes - prev_expenses
         
         official_rate = bluelytics_service.get_official_rate()
         rate = Decimal(str(official_rate.sell)) if official_rate and official_rate.sell > 0 else Decimal('1000')
@@ -89,5 +114,9 @@ class DashboardView(LoginRequiredMixin, View):
             'purchasing_power': purchasing_power,
             'alerts': alerts,
             'apis_status': apis_status,
+            'prev_month_incomes': prev_incomes,
+            'prev_month_expenses': prev_expenses,
+            'prev_month_balance': prev_balance,
+            'prev_month_name': first_day_prev.strftime('%B'),
         }
         return render(request, self.template_name, context)

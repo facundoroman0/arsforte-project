@@ -30,6 +30,12 @@
     </div>
     
     <div class="metrics-grid">
+      {% if prev_month_incomes > 0 %}
+      <div class="card metric-card prev-month-summary">
+        <span class="text-sm text-secondary-text">Mes anterior ({{ prev_month_name }})</span>
+        <span class="text-lg font-mono {% if prev_month_balance < 0 %}text-secondary{% else %}text-primary{% endif %}">{{ prev_month_balance|money }}</span>
+      </div>
+      {% endif %}
       <div class="card metric-card">
         <span class="text-sm text-secondary-text">Ingresos del mes</span>
         <span class="text-2xl font-bold text-primary font-mono">
@@ -226,6 +232,11 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+}
+
+.prev-month-summary {
+  opacity: 0.85;
+  border-left: 3px solid var(--color-text-secondary);
 }
 
 .distribution-list {
