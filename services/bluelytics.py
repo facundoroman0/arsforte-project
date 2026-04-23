@@ -49,5 +49,31 @@ class BluelyticsService:
             logger.error(f'Bluelytics API unexpected error: {e}')
         return None
 
+    @cached(ttl_seconds=900)
+    def get_official_rate(self) -> Optional[BlueRate]:
+        try:
+            response = requests.get(
+                f'{self.BASE_URL}/latest',
+                timeout=10
+            )
+            if response.status_code == 200:
+                data = response.json()
+                return BlueRate(
+                    buy=data.get('oficial', {}).get('value_buy', 0),
+                    sell=data.get('oficial', {}).get('value_sell', 0),
+                    source='bluelytics'
+                )
+            else:
+                logger.warning(
+                    f'Bluelytics API returned status {response.status_code}'
+                )
+        except requests.Timeout:
+            logger.error('Bluelytics API request timed out')
+        except requests.ConnectionError as e:
+            logger.error(f'Bluelytics API connection error: {e}')
+        except Exception as e:
+            logger.error(f'Bluelytics API unexpected error: {e}')
+        return None
+
 
 bluelytics_service = BluelyticsService()

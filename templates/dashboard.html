@@ -19,21 +19,41 @@
 
 <main class="container">
   <div class="dashboard">
-    <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+    <div class="dashboard-header">
+      <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+      <div class="currency-toggle">
+        <button id="currency-toggle" class="toggle-btn">
+          <span class="toggle-option" data-currency="ars">ARS</span>
+          <span class="toggle-option" data-currency="usd">USD</span>
+        </button>
+      </div>
+    </div>
     
     <div class="metrics-grid">
       <div class="card metric-card">
         <span class="text-sm text-secondary-text">Ingresos del mes</span>
-        <span class="text-2xl font-bold text-primary font-mono">{{ incomes|money }}</span>
+        <span class="text-2xl font-bold text-primary font-mono">
+          <span class="ars-value">{{ incomes|money }}</span>
+          <span class="usd-value" style="display:none">US$ {{ incomes_usd|default:"0" }}</span>
+        </span>
       </div>
       <div class="card metric-card">
         <span class="text-sm text-secondary-text">Gastos del mes</span>
-        <span class="text-2xl font-bold text-secondary font-mono">{{ expenses|money }}</span>
+        <span class="text-2xl font-bold text-secondary font-mono">
+          <span class="ars-value">{{ expenses|money }}</span>
+          <span class="usd-value" style="display:none">US$ {{ expenses_usd|default:"0" }}</span>
+        </span>
       </div>
       <div class="card metric-card">
         <span class="text-sm text-secondary-text">Balance del mes</span>
-        <span class="text-2xl font-bold font-mono {% if balance < 0 %}text-secondary{% else %}text-primary{% endif %}">{{ balance|money }}</span>
+        <span class="text-2xl font-bold font-mono {% if balance < 0 %}text-secondary{% else %}text-primary{% endif %}">
+          <span class="ars-value">{{ balance|money }}</span>
+          <span class="usd-value" style="display:none">US$ {{ balance_usd|default:"0" }}</span>
+        </span>
       </div>
+    </div>
+    <div class="rate-info">
+      <span>Dólar oficial: ${{ current_rate|floatformat:0 }}</span>
     </div>
 
     {% if alerts %}
@@ -426,5 +446,83 @@
     grid-template-columns: 1fr;
   }
 }
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.currency-toggle {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.toggle-btn {
+  display: flex;
+  background: var(--color-surface-hover);
+  border-radius: 8px;
+  padding: 2px;
+  border: 1px solid var(--color-border);
+}
+
+.toggle-option {
+  padding: var(--space-2) var(--space-4);
+  border-radius: 6px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms ease;
+  color: var(--color-text-secondary);
+}
+
+.toggle-option.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+.rate-info {
+  text-align: right;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-2);
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+}
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const toggle = document.getElementById('currency-toggle');
+  const arsValues = document.querySelectorAll('.ars-value');
+  const usdValues = document.querySelectorAll('.usd-value');
+  
+  function setCurrency(currency) {
+    if (currency === 'usd') {
+      arsValues.forEach(el => el.style.display = 'none');
+      usdValues.forEach(el => el.style.display = 'inline');
+      toggle.querySelector('[data-currency="ars"]').classList.remove('active');
+      toggle.querySelector('[data-currency="usd"]').classList.add('active');
+    } else {
+      arsValues.forEach(el => el.style.display = 'inline');
+      usdValues.forEach(el => el.style.display = 'none');
+      toggle.querySelector('[data-currency="ars"]').classList.add('active');
+      toggle.querySelector('[data-currency="usd"]').classList.remove('active');
+    }
+  }
+  
+  toggle.querySelectorAll('.toggle-option').forEach(option => {
+    option.addEventListener('click', function() {
+      setCurrency(this.dataset.currency);
+    });
+  });
+  
+  setCurrency('ars');
+});
+</script>
 {% endblock %}

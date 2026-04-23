@@ -5,7 +5,7 @@ from django.db.models import Sum
 from decimal import Decimal
 from datetime import date
 from transactions.models import Transaction, TransactionType
-from services import opportunity_cost
+from services import opportunity_cost, bluelytics_service
 from services.alerts import get_user_alerts
 from services.api_status import get_apis_status
 
@@ -13,6 +13,16 @@ from services.api_status import get_apis_status
 def get_year_start() -> date:
     today = date.today()
     return date(today.year, 1, 1)
+
+
+def calculate_usd_values(incomes: Decimal, expenses: Decimal, balance: Decimal, rate: Decimal) -> dict:
+    if rate > 0:
+        return {
+            'incomes_usd': round(incomes / rate, 2),
+            'expenses_usd': round(expenses / rate, 2),
+            'balance_usd': round(balance / rate, 2),
+        }
+    return {'incomes_usd': Decimal('0'), 'expenses_usd': Decimal('0'), 'balance_usd': Decimal('0')}
 
 
 class DashboardView(LoginRequiredMixin, View):
@@ -36,6 +46,11 @@ class DashboardView(LoginRequiredMixin, View):
         ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
         
         balance = incomes - expenses
+        
+        official_rate = bluelytics_service.get_official_rate()
+        rate = Decimal(str(official_rate.sell)) if official_rate and official_rate.sell > 0 else Decimal('1000')
+        
+        usd_values = calculate_usd_values(incomes, expenses, balance, rate)
         
         instrument_distribution = month_transactions.values(
             'instrument_type'
@@ -64,6 +79,10 @@ class DashboardView(LoginRequiredMixin, View):
             'incomes': incomes,
             'expenses': expenses,
             'balance': balance,
+            'incomes_usd': usd_values['incomes_usd'],
+            'expenses_usd': usd_values['expenses_usd'],
+            'balance_usd': usd_values['balance_usd'],
+            'current_rate': rate,
             'instrument_distribution': instrument_distribution,
             'recent_transactions': recent_transactions,
             'opportunity': opportunity,
