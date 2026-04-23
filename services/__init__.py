@@ -6,3 +6,4 @@ from .cache import cached
 from . import opportunity_cost
 from . import api_status
 from . import historical_rates
+from . import exchange_rates

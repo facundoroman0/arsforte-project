@@ -302,93 +302,86 @@ def analyze_transaction(
     )
 
 
-def get_total_opportunity_cost(user, month_start) -> dict:
+def get_total_opportunity_cost(user, month_start, rates=None) -> dict:
     """
     Calcula el costo de oportunidad total del usuario para el mes.
     
-    Usa la transacción más antigua del período para obtener los exchange rates
-    de referencia y calcula cuánto habría ganado el balance total.
+    Convierte todas las transacciones a ARS y calcula cuánto habría 
+    ganado el balance total si se hubiera invertido en lugar de mantenerlo.
     
     Args:
         user: Usuario a analizar.
         month_start: Fecha de inicio del período (primer día del mes).
+        rates: ExchangeRates opcional. Si no se pasa, los obtiene.
     
     Returns:
         Dict con totales de ingresos, gastos, balance y ganancias potenciales.
     """
     from transactions.models import Transaction, TransactionType
+    from services.exchange_rates import get_current_exchange_rates, get_amount_in_ars
     
-    incomes = Transaction.objects.filter(
+    if rates is None:
+        rates = get_current_exchange_rates()
+    
+    month_transactions = Transaction.objects.filter(
         user=user,
-        date__gte=month_start,
-        transaction_type=TransactionType.INCOME
+        date__gte=month_start
     )
     
-    expenses = Transaction.objects.filter(
-        user=user,
-        date__gte=month_start,
-        transaction_type=TransactionType.EXPENSE
-    )
+    incomes_list = [
+        get_amount_in_ars(tx, rates) 
+        for tx in month_transactions.filter(transaction_type=TransactionType.INCOME)
+    ]
+    total_income = sum(incomes_list, Decimal('0'))
     
-    total_income = sum((tx.amount for tx in incomes), Decimal('0'))
-    total_expense = sum((tx.amount for tx in expenses), Decimal('0'))
+    expenses_list = [
+        get_amount_in_ars(tx, rates) 
+        for tx in month_transactions.filter(transaction_type=TransactionType.EXPENSE)
+    ]
+    total_expense = sum(expenses_list, Decimal('0'))
+    
     balance = total_income - total_expense
-    
-    # Calcula balance en pesos (neto de ingresos y gastos en pesos)
-    pesos_income = sum(
-        (tx.amount for tx in incomes if tx.instrument_type == 'pesos'),
-        Decimal('0')
-    )
-    pesos_expense = sum(
-        (tx.amount for tx in expenses if tx.instrument_type == 'pesos'),
-        Decimal('0')
-    )
-    balance_in_pesos = max(pesos_income - pesos_expense, Decimal('0'))
     
     if balance <= 0:
         return {
             'total_income': total_income,
             'total_expense': total_expense,
             'balance': balance,
-            'balance_in_pesos': balance_in_pesos,
+            'balance_in_pesos': Decimal('0'),
             'potential_gain_dollar': Decimal('0'),
             'potential_gain_bitcoin': Decimal('0'),
             'potential_gain_uva': Decimal('0'),
         }
     
-    from services.exchange_rates import get_current_exchange_rates
-    current_rates = get_current_exchange_rates()
-    
     total_dollar_gain = Decimal('0')
     total_bitcoin_gain = Decimal('0')
     total_uva_gain = Decimal('0')
     
-    if current_rates.dollar_blue > 0:
-        oldest_income = incomes.order_by('date').first()
-        if oldest_income and oldest_income.exchange_rate_dollar_blue:
+    oldest_income = month_transactions.filter(
+        transaction_type=TransactionType.INCOME
+    ).order_by('date').first()
+    
+    if oldest_income:
+        if rates.dollar_blue > 0 and oldest_income.exchange_rate_dollar_blue:
             old_rate = oldest_income.exchange_rate_dollar_blue
-            new_rate = current_rates.dollar_blue
+            new_rate = rates.dollar_blue
             total_dollar_gain = balance * (new_rate / old_rate - 1)
-    
-    if current_rates.bitcoin > 0:
-        oldest_income = incomes.order_by('date').first()
-        if oldest_income and oldest_income.exchange_rate_bitcoin:
+        
+        if rates.bitcoin > 0 and oldest_income.exchange_rate_bitcoin:
             old_rate = oldest_income.exchange_rate_bitcoin
-            new_rate = current_rates.bitcoin
+            new_rate = rates.bitcoin
             total_bitcoin_gain = balance * (new_rate / old_rate - 1)
-    
-    if current_rates.uva > 0:
-        oldest_income = incomes.order_by('date').first()
-        if oldest_income and oldest_income.exchange_rate_uva:
+        
+        if rates.uva > 0 and oldest_income.exchange_rate_uva:
             old_rate = oldest_income.exchange_rate_uva
-            new_rate = current_rates.uva
+            new_rate = rates.uva
             total_uva_gain = balance * (new_rate / old_rate - 1)
     
     return {
         'total_income': total_income,
         'total_expense': total_expense,
         'balance': balance,
-        'balance_in_pesos': balance_in_pesos,
+        'balance_in_pesos': balance,
         'potential_gain_dollar': total_dollar_gain,
         'potential_gain_bitcoin': total_bitcoin_gain,
         'potential_gain_uva': total_uva_gain,
