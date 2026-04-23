@@ -4,8 +4,8 @@ from django.views import View
 from django.db.models import Sum
 from decimal import Decimal
 from datetime import date, timedelta
-from transactions.models import Transaction, TransactionType
-from services import opportunity_cost, bluelytics_service
+from transactions.models import Transaction, TransactionType, InstrumentType
+from services import opportunity_cost, bluelytics_service, coingecko_service, bcra_service
 from services.alerts import get_user_alerts
 from services.api_status import get_apis_status
 
@@ -15,11 +15,43 @@ def get_year_start() -> date:
     return date(today.year, 1, 1)
 
 
-def get_month_summary(transactions, start_date, end_date, transaction_type=None):
-    filtered = transactions.filter(date__gte=start_date, date__lte=end_date)
-    if transaction_type:
-        filtered = filtered.filter(transaction_type=transaction_type)
-    return filtered.aggregate(total=Sum('amount'))['total'] or Decimal('0')
+def get_current_rates() -> dict:
+    official_rate = bluelytics_service.get_official_rate()
+    blue_rate = bluelytics_service.get_blue_rate()
+    btc_price = coingecko_service.get_bitcoin_price()
+    uva_data = bcra_service.get_uva_data()
+    
+    return {
+        'dolar_oficial': Decimal(str(official_rate.sell)) if official_rate and official_rate.sell > 0 else Decimal('1000'),
+        'dolar_blue': Decimal(str(blue_rate.sell)) if blue_rate and blue_rate.sell > 0 else Decimal('1000'),
+        'bitcoin': Decimal(str(btc_price.price_ars)) if btc_price and btc_price.price_ars > 0 else Decimal('100000000'),
+        'uva': Decimal(str(uva_data.uva_price)) if uva_data else Decimal('400'),
+    }
+
+
+def get_amount_in_ars(transaction: Transaction, rates: dict) -> Decimal:
+    instrument = transaction.instrument_type
+    
+    if instrument == InstrumentType.PESOS:
+        return transaction.amount
+    
+    if instrument == InstrumentType.DOLAR_OFICIAL:
+        rate = transaction.exchange_rate_dolar_oficial or rates['dolar_oficial']
+        return transaction.amount * rate
+    
+    if instrument == InstrumentType.DOLAR_BLUE:
+        rate = transaction.exchange_rate_dollar_blue or rates['dolar_blue']
+        return transaction.amount * rate
+    
+    if instrument == InstrumentType.BITCOIN:
+        rate = transaction.exchange_rate_bitcoin or rates['bitcoin']
+        return transaction.amount * rate
+    
+    if instrument == InstrumentType.PLAZO_FIJO_UVA:
+        rate = transaction.exchange_rate_uva or rates['uva']
+        return transaction.amount * rate
+    
+    return transaction.amount
 
 
 def calculate_usd_values(incomes: Decimal, expenses: Decimal, balance: Decimal, rate: Decimal) -> dict:
@@ -43,14 +75,19 @@ class DashboardView(LoginRequiredMixin, View):
         
         transactions = Transaction.objects.filter(user=request.user)
         month_transactions = transactions.filter(date__gte=month_start, date__lte=today)
+        rates = get_current_rates()
         
-        incomes = month_transactions.filter(
-            transaction_type=TransactionType.INCOME
-        ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
+        incomes_list = [
+            get_amount_in_ars(tx, rates) 
+            for tx in month_transactions.filter(transaction_type=TransactionType.INCOME)
+        ]
+        incomes = sum(incomes_list, Decimal('0'))
         
-        expenses = month_transactions.filter(
-            transaction_type=TransactionType.EXPENSE
-        ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
+        expenses_list = [
+            get_amount_in_ars(tx, rates) 
+            for tx in month_transactions.filter(transaction_type=TransactionType.EXPENSE)
+        ]
+        expenses = sum(expenses_list, Decimal('0'))
         
         balance = incomes - expenses
         
@@ -62,13 +99,17 @@ class DashboardView(LoginRequiredMixin, View):
             date__lt=month_start
         )
         
-        prev_incomes = prev_month_transactions.filter(
-            transaction_type=TransactionType.INCOME
-        ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
+        prev_incomes_list = [
+            get_amount_in_ars(tx, rates) 
+            for tx in prev_month_transactions.filter(transaction_type=TransactionType.INCOME)
+        ]
+        prev_incomes = sum(prev_incomes_list, Decimal('0'))
         
-        prev_expenses = prev_month_transactions.filter(
-            transaction_type=TransactionType.EXPENSE
-        ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
+        prev_expenses_list = [
+            get_amount_in_ars(tx, rates) 
+            for tx in prev_month_transactions.filter(transaction_type=TransactionType.EXPENSE)
+        ]
+        prev_expenses = sum(prev_expenses_list, Decimal('0'))
         
         prev_balance = prev_incomes - prev_expenses
         

@@ -55,6 +55,10 @@ class Transaction(models.Model):
         max_digits=15, decimal_places=2, null=True, blank=True,
         help_text="Cotización del dólar blue al momento de la transacción"
     )
+    exchange_rate_dolar_oficial = models.DecimalField(
+        max_digits=15, decimal_places=2, null=True, blank=True,
+        help_text="Cotización del dólar oficial al momento de la transacción"
+    )
     exchange_rate_bitcoin = models.DecimalField(
         max_digits=20, decimal_places=2, null=True, blank=True,
         help_text="Precio del Bitcoin (ARS) al momento de la transacción"
