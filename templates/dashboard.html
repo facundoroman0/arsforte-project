@@ -31,26 +31,26 @@
     
     <div class="metrics-grid">
       {% if prev_month_incomes > 0 %}
-      <div class="card metric-card prev-month-summary">
+      <div class="glass-card metric-card prev-month-summary">
         <span class="text-sm text-secondary-text">Mes anterior ({{ prev_month_name }})</span>
         <span class="text-lg font-mono {% if prev_month_balance < 0 %}text-secondary{% else %}text-primary{% endif %}">{{ prev_month_balance|money }}</span>
       </div>
       {% endif %}
-      <div class="card metric-card">
+      <div class="glass-card metric-card">
         <span class="text-sm text-secondary-text">Ingresos del mes</span>
         <span class="text-2xl font-bold text-primary font-mono">
           <span class="ars-value">{{ incomes|money }}</span>
           <span class="usd-value" style="display:none">US$ {{ incomes_usd|default:"0" }}</span>
         </span>
       </div>
-      <div class="card metric-card">
+      <div class="glass-card metric-card">
         <span class="text-sm text-secondary-text">Gastos del mes</span>
         <span class="text-2xl font-bold text-secondary font-mono">
           <span class="ars-value">{{ expenses|money }}</span>
           <span class="usd-value" style="display:none">US$ {{ expenses_usd|default:"0" }}</span>
         </span>
       </div>
-      <div class="card metric-card">
+      <div class="glass-card metric-card">
         <span class="text-sm text-secondary-text">Balance del mes</span>
         <span class="text-2xl font-bold font-mono {% if balance < 0 %}text-secondary{% else %}text-primary{% endif %}">
           <span class="ars-value">{{ balance|money }}</span>
@@ -83,7 +83,7 @@
     {% endif %}
 
     {% comment %} {% if instrument_distribution %}
-    <div class="card mt-6">
+    <div class="glass-card mt-6">
       <h2 class="text-lg font-semibold mb-4">Distribución por instrumento</h2>
       <div class="distribution-list">
         {% for item in instrument_distribution %}
@@ -102,7 +102,7 @@
     {% endif %} {% endcomment %}
 
     {% if purchasing_power and purchasing_power.total_income > 0 %}
-    <div class="card mt-6 purchasing-power-card">
+    <div class="glass-card mt-6 purchasing-power-card">
       <div class="purchasing-power-header">
         <h2 class="text-lg font-semibold">Tu poder adquisitivo real</h2>
         <span class="period-badge">{{ purchasing_power.start_date|date:"d/m" }} → hoy</span>
@@ -125,7 +125,7 @@
     {% endif %}
 
     {% if opportunity and opportunity.balance_in_pesos > 0 %}
-    <div class="card mt-6">
+    <div class="glass-card mt-6">
       <h2 class="text-lg font-semibold mb-4">Costo de Oportunidad</h2>
       <p class="text-sm text-secondary-text mb-4">Si hubieras invertido tu balance en pesos ({{ opportunity.balance_in_pesos|money }}) en lugar de mantenerlo:</p>
       <div class="opportunity-grid">
@@ -152,7 +152,7 @@
     {% endif %}
     
     {% if recent_transactions %}
-    <div class="card mt-6">
+    <div class="glass-card mt-6">
       <h2 class="text-lg font-semibold mb-4">Transacciones recientes</h2>
       <table class="table">
         <thead>
@@ -187,7 +187,7 @@
       </div>
     </div>
     {% else %}
-    <div class="card mt-6 empty-state">
+    <div class="glass-card mt-6 empty-state">
       <div class="empty-state-icon">📊</div>
       <h3 class="empty-state-title">No hay transacciones este mes</h3>
       <p class="text-secondary-text">Empezá a registrar tus ingresos y gastos para ver tu dashboard.</p>
@@ -198,264 +198,16 @@
 </main>
 
 <style>
-.navbar {
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  padding: var(--space-4) 0;
-  margin-bottom: var(--space-6);
-}
-
-.navbar-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.navbar-actions {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-4);
-}
-
-@media (max-width: 768px) {
-  .metrics-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 .metric-card {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  padding: var(--space-6);
 }
 
 .prev-month-summary {
   opacity: 0.85;
-  border-left: 3px solid var(--color-text-secondary);
-}
-
-.distribution-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.distribution-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.distribution-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--text-sm);
-}
-
-.distribution-bar {
-  height: 8px;
-  background: var(--color-surface-hover);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.distribution-fill {
-  height: 100%;
-  background: var(--color-primary);
-  border-radius: 4px;
-  transition: width 300ms ease;
-}
-
-.opportunity-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-4);
-}
-
-.opportunity-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-4);
-  background: var(--color-surface-hover);
-  border-radius: 8px;
-}
-
-@media (max-width: 768px) {
-  .opportunity-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table th,
-.table td {
-  padding: var(--space-3) var(--space-4);
-  text-align: left;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.table th {
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  font-size: var(--text-sm);
-}
-
-.badge {
-  padding: var(--space-1) var(--space-2);
-  border-radius: 4px;
-  font-size: var(--text-xs);
-  font-weight: 500;
-}
-
-.badge-income {
-  background: rgba(16, 185, 129, 0.1);
-  color: var(--color-primary);
-}
-
-.badge-expense {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--color-secondary);
-}
-
-.empty-state {
-  text-align: center;
-  padding: var(--space-12);
-}
-
-.empty-state-icon {
-  font-size: 48px;
-  margin-bottom: var(--space-4);
-}
-
-.empty-state-title {
-  font-size: var(--text-lg);
-  font-weight: 600;
-  margin-bottom: var(--space-2);
-}
-
-.alert {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border-radius: 8px;
-  font-size: var(--text-sm);
-}
-
-.alert-warning {
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid var(--color-warning);
-  color: #B45309;
-}
-
-.alert-icon {
-  font-size: var(--text-lg);
-}
-
-.alert-link {
-  margin-left: auto;
-  color: var(--color-warning);
-  text-decoration: underline;
-}
-
-.mb-6 { margin-bottom: var(--space-6); }
-.mt-4 { margin-top: var(--space-4); }
-.mt-6 { margin-top: var(--space-6); }
-
-.apis-status {
-  display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.api-badge {
-  padding: var(--space-1) var(--space-2);
-  border-radius: 4px;
-  font-size: var(--text-xs);
-  font-weight: 500;
-}
-
-.api-ok {
-  background: rgba(16, 185, 129, 0.1);
-  color: var(--color-primary);
-}
-
-.api-error {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--color-secondary);
-}
-
-.purchasing-power-card {
-  background: linear-gradient(135deg, var(--color-surface) 0%, rgba(16, 185, 129, 0.05) 100%);
-  border: 1px solid var(--color-primary);
-}
-
-.purchasing-power-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-4);
-}
-
-.period-badge {
-  font-size: var(--text-xs);
-  padding: var(--space-1) var(--space-2);
-  background: rgba(16, 185, 129, 0.1);
-  color: var(--color-primary);
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-.purchasing-power-content {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-4);
-}
-
-.power-metric {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-4);
-  background: var(--color-surface-hover);
-  border-radius: 8px;
-  text-align: center;
-}
-
-.power-metric-label {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-}
-
-.power-metric-value {
-  font-size: var(--text-xl);
-  font-weight: 700;
-  font-family: monospace;
-}
-
-.power-loss {
-  border-left: 3px solid var(--color-secondary);
-}
-
-.power-gain {
-  border-left: 3px solid var(--color-primary);
-}
-
-@media (max-width: 768px) {
-  .purchasing-power-content {
-    grid-template-columns: 1fr;
-  }
+  border-left: 3px solid var(--text-secondary);
 }
 
 .dashboard-header {
@@ -471,33 +223,38 @@
 
 .toggle-btn {
   display: flex;
-  background: var(--color-surface-hover);
-  border-radius: 8px;
-  padding: 2px;
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 3px;
+  border: 1px solid var(--glass-border);
 }
 
 .toggle-option {
   padding: var(--space-2) var(--space-4);
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: var(--text-sm);
   font-weight: 500;
   cursor: pointer;
   transition: all 150ms ease;
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
 }
 
 .toggle-option.active {
-  background: var(--color-primary);
-  color: white;
+  background: var(--accent-yellow);
+  color: #0f0f1a;
+  font-weight: 600;
 }
 
 .rate-info {
   text-align: right;
   font-size: var(--text-xs);
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
   margin-top: var(--space-2);
 }
+
+.mb-6 { margin-bottom: var(--space-6); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
 
 @media (max-width: 768px) {
   .dashboard-header {
