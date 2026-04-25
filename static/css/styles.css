@@ -302,6 +302,15 @@ a:hover {
   color: #e74c3c;
 }
 
+/* Gain/Loss Colors */
+.text-gain {
+  color: #10b981;
+}
+
+.text-loss {
+  color: #e74c3c;
+}
+
 /* Badge */
 .badge {
   padding: var(--space-1) var(--space-2);

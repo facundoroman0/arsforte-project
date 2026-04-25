@@ -110,15 +110,15 @@
       <div class="purchasing-power-content">
         <div class="power-metric power-loss">
           <span class="power-metric-label">En pesos</span>
-          <span class="power-metric-value text-secondary">-{{ purchasing_power.inflation_loss_pct|floatformat:1 }}%</span>
+          <span class="power-metric-value text-loss">{{ purchasing_power.inflation_loss_pct|floatformat:1 }}%</span>
         </div>
         <div class="power-metric power-gain">
           <span class="power-metric-label">Si dolarizaras</span>
-          <span class="power-metric-value text-primary">+{{ purchasing_power.dollar_gain_pct|floatformat:1 }}%</span>
+          <span class="power-metric-value text-gain">{{ purchasing_power.dollar_gain_pct|floatformat:1 }}%</span>
         </div>
         <div class="power-metric power-gain">
           <span class="power-metric-label">Si PF UVA</span>
-          <span class="power-metric-value text-primary">+{{ purchasing_power.uva_gain_pct|floatformat:1 }}%</span>
+          <span class="power-metric-value text-gain">{{ purchasing_power.uva_gain_pct|floatformat:1 }}%</span>
         </div>
       </div>
     </div>
@@ -131,19 +131,19 @@
       <div class="opportunity-grid">
         <div class="opportunity-item">
           <span class="text-sm text-secondary-text">Dólar Blue</span>
-          <span class="font-mono {% if opportunity.potential_gain_dollar > 0 %}text-primary{% else %}text-secondary{% endif %}">
+          <span class="font-mono {% if opportunity.potential_gain_dollar > 0 %}text-gain{% else %}text-loss{% endif %}">
             {% if opportunity.potential_gain_dollar > 0 %}+{% endif %}{{ opportunity.potential_gain_dollar|money }}
           </span>
         </div>
         <div class="opportunity-item">
           <span class="text-sm text-secondary-text">Bitcoin</span>
-          <span class="font-mono {% if opportunity.potential_gain_bitcoin > 0 %}text-primary{% else %}text-secondary{% endif %}">
+          <span class="font-mono {% if opportunity.potential_gain_bitcoin > 0 %}text-gain{% else %}text-loss{% endif %}">
             {% if opportunity.potential_gain_bitcoin > 0 %}+{% endif %}{{ opportunity.potential_gain_bitcoin|money }}
           </span>
         </div>
         <div class="opportunity-item">
           <span class="text-sm text-secondary-text">Plazo Fijo UVA</span>
-          <span class="font-mono {% if opportunity.potential_gain_uva > 0 %}text-primary{% else %}text-secondary{% endif %}">
+          <span class="font-mono {% if opportunity.potential_gain_uva > 0 %}text-gain{% else %}text-loss{% endif %}">
             {% if opportunity.potential_gain_uva > 0 %}+{% endif %}{{ opportunity.potential_gain_uva|money }}
           </span>
         </div>
@@ -175,7 +175,7 @@
             </td>
             <td>{{ tx.get_category_display }}</td>
             <td>{{ tx.get_instrument_type_display }}</td>
-            <td class="font-mono {% if tx.transaction_type == 'income' %}text-primary{% else %}text-secondary{% endif %}">
+            <td class="font-mono {% if tx.transaction_type == 'income' %}text-gain{% else %}text-loss{% endif %}">
               {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}{{ tx.amount|money }}
             </td>
           </tr>
