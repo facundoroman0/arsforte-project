@@ -3,10 +3,40 @@ from django import forms
 from .models import Transaction, TransactionType, Category, InstrumentType
 
 
+class GlassTextInput(forms.TextInput):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('attrs', {})
+        kwargs['attrs'].setdefault('class', 'glass-input')
+        super().__init__(*args, **kwargs)
+
+
+class GlassNumberInput(forms.NumberInput):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('attrs', {})
+        kwargs['attrs'].setdefault('class', 'glass-input')
+        super().__init__(*args, **kwargs)
+
+
+class GlassDateInput(forms.DateInput):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('attrs', {})
+        kwargs['attrs'].setdefault('class', 'glass-input')
+        kwargs['attrs'].setdefault('type', 'date')
+        super().__init__(*args, **kwargs)
+
+
+class GlassTextarea(forms.Textarea):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('attrs', {})
+        kwargs['attrs'].setdefault('class', 'glass-input')
+        kwargs['attrs'].setdefault('rows', 3)
+        super().__init__(*args, **kwargs)
+
+
 class TransactionForm(forms.ModelForm):
     transaction_type = forms.ChoiceField(
         choices=TransactionType.choices,
-        widget=forms.RadioSelect,
+        widget=forms.RadioSelect(attrs={'class': 'glass-radio'}),
         required=True
     )
 
@@ -23,9 +53,9 @@ class TransactionForm(forms.ModelForm):
             'category', 'instrument_type', 'description'
         ]
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
-            'amount': forms.NumberInput(attrs={'step': '0.01', 'min': '0'}),
-            'description': forms.Textarea(attrs={'rows': 3}),
+            'date': GlassDateInput(),
+            'amount': GlassNumberInput(attrs={'step': '0.01', 'min': '0'}),
+            'description': GlassTextarea(),
         }
 
     def clean_date(self):
