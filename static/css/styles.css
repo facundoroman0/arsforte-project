@@ -293,6 +293,14 @@ a:hover {
 .text-warning { color: var(--color-warning); }
 .text-muted { color: var(--text-muted); }
 .text-secondary-text { color: var(--text-secondary); }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+
+/* Metric Expense Color */
+.metric-expense {
+  color: #e74c3c;
+}
 
 /* Badge */
 .badge {

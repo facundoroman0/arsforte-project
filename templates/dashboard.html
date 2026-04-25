@@ -45,7 +45,7 @@
       </div>
       <div class="glass-card metric-card">
         <span class="text-sm text-secondary-text">Gastos del mes</span>
-        <span class="text-2xl font-bold text-secondary font-mono">
+        <span class="text-2xl font-bold font-mono metric-expense">
           <span class="ars-value">{{ expenses|money }}</span>
           <span class="usd-value" style="display:none">US$ {{ expenses_usd|default:"0" }}</span>
         </span>
@@ -102,7 +102,8 @@
     {% endif %} {% endcomment %}
 
     {% if purchasing_power and purchasing_power.total_income > 0 %}
-    <div class="glass-card mt-6 purchasing-power-card">
+    <div class="glass-card mt-6 purchasing-power-card" style="padding: var(--space-6);">
+      <div class="purchasing-power-header">
       <div class="purchasing-power-header">
         <h2 class="text-lg font-semibold">Tu poder adquisitivo real</h2>
         <span class="period-badge">{{ purchasing_power.start_date|date:"d/m" }} → hoy</span>
@@ -125,7 +126,7 @@
     {% endif %}
 
     {% if opportunity and opportunity.balance_in_pesos > 0 %}
-    <div class="glass-card mt-6">
+    <div class="glass-card mt-6" style="padding: var(--space-6);">
       <h2 class="text-lg font-semibold mb-4">Costo de Oportunidad</h2>
       <p class="text-sm text-secondary-text mb-4">Si hubieras invertido tu balance en pesos ({{ opportunity.balance_in_pesos|money }}) en lugar de mantenerlo:</p>
       <div class="opportunity-grid">
@@ -152,7 +153,7 @@
     {% endif %}
     
     {% if recent_transactions %}
-    <div class="glass-card mt-6">
+    <div class="glass-card mt-6" style="padding: var(--space-6);">
       <h2 class="text-lg font-semibold mb-4">Transacciones recientes</h2>
       <table class="table">
         <thead>
@@ -182,8 +183,8 @@
           {% endfor %}
         </tbody>
       </table>
-      <div class="mt-4">
-        <a href="{% url 'transactions:list' %}" class="btn btn-ghost">Ver todas las transacciones →</a>
+      <div class="mt-4 text-center">
+        <a href="{% url 'transactions:list' %}" class="btn btn-ghost">Ver todas las transacciones</a>
       </div>
     </div>
     {% else %}
