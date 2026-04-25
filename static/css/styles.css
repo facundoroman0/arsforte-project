@@ -138,6 +138,25 @@ a:hover {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
 
+/* Card Glow Effect */
+.glass-card.glow-yellow {
+  border-color: rgba(244, 208, 63, 0.3);
+}
+
+.glass-card.glow-yellow:hover {
+  border-color: rgba(244, 208, 63, 0.5);
+  box-shadow: 0 12px 40px rgba(244, 208, 63, 0.15);
+}
+
+.glass-card.glow-cyan {
+  border-color: rgba(93, 173, 226, 0.3);
+}
+
+.glass-card.glow-cyan:hover {
+  border-color: rgba(93, 173, 226, 0.5);
+  box-shadow: 0 12px 40px rgba(93, 173, 226, 0.15);
+}
+
 /* Glass Input */
 .glass-input {
   width: 100%;
@@ -778,3 +797,109 @@ select.glass-input:focus,
 .card {
   padding: var(--space-6);
 }
+
+/* Responsive Utilities */
+@media (max-width: 640px) {
+  .container {
+    padding: 0 var(--space-3);
+  }
+  
+  .glass-card,
+  .auth-card {
+    border-radius: 12px;
+    padding: var(--space-4);
+  }
+  
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .opportunity-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .purchasing-power-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+  
+  .table th,
+  .table td {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .btn {
+    width: 100%;
+  }
+}
+
+/* Hover Scale Effect */
+.hover-scale {
+  transition: transform var(--transition-fast);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Focus Ring Animation */
+@keyframes focus-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(93, 173, 226, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(93, 173, 226, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(93, 173, 226, 0);
+  }
+}
+
+.glass-input:focus-visible,
+.glass-select:focus-visible {
+  animation: focus-pulse 0.3s ease-out;
+}
+
+/* Skeleton Loading */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Utility Classes */
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.min-h-screen { min-height: 100vh; }
+.opacity-50 { opacity: 0.5; }
+.opacity-75 { opacity: 0.75; }
+.cursor-pointer { cursor: pointer; }
+.cursor-not-allowed { cursor: not-allowed; }
+.select-none { user-select: none; }
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
