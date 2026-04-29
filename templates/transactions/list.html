@@ -3,19 +3,12 @@
 
 {% block title %}Transacciones - ArsForte{% endblock %}
 
-{% block content %}
-<nav class="navbar">
-  <div class="container navbar-content">
-    <div class="navbar-brand">
-      <span class="text-xl font-bold">ArsForte</span>
-    </div>
-    <div class="navbar-actions">
-      <a href="{% url 'dashboard' %}" class="btn btn-ghost">Dashboard</a>
-      <a href="{% url 'logout' %}" class="btn btn-ghost">Cerrar sesión</a>
-    </div>
-  </div>
-</nav>
+{% block navbar_actions %}
+  <a href="{% url 'dashboard' %}" class="btn btn-ghost">Dashboard</a>
+  <a href="{% url 'logout' %}" class="btn btn-ghost">Cerrar sesión</a>
+{% endblock %}
 
+{% block content %}
 <main class="container">
   <div class="page-header">
     <h1 class="text-2xl font-bold">Transacciones</h1>

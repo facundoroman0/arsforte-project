@@ -5,21 +5,6 @@ from django.core.validators import MinLengthValidator
 
 User = get_user_model()
 
-
-# class GlassTextInput(forms.TextInput):
-#     def __init__(self, *args, **kwargs):
-#         kwargs.setdefault('attrs', {})
-#         kwargs['attrs'].setdefault('class', 'glass-input')
-#         super().__init__(*args, **kwargs)
-
-
-# class GlassPasswordInput(forms.PasswordInput):
-#     def __init__(self, *args, **kwargs):
-#         kwargs.setdefault('attrs', {})
-#         kwargs['attrs'].setdefault('class', 'glass-input')
-#         super().__init__(*args, **kwargs)
-
-
 class CustomUserCreationForm(UserCreationForm):
     username = forms.CharField(
         label='Usuario',

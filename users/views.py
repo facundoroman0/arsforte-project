@@ -11,14 +11,6 @@ from .forms import CustomUserCreationForm
 
 User = get_user_model()
 
-
-# class GlassAuthenticationForm(AuthenticationForm):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         self.fields['username'].widget = forms.TextInput(attrs={'class': 'glass-input', 'placeholder': 'Email'})
-#         self.fields['password'].widget = forms.PasswordInput(attrs={'class': 'glass-input', 'placeholder': 'Contraseña'})
-
-
 class LoginView(View):
     template_name = 'users/login.html'
 
@@ -26,7 +18,7 @@ class LoginView(View):
         if request.user.is_authenticated:
             return redirect('dashboard')
         form = AuthenticationForm()
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'form': form,'hide_navbar': True})
 
     def post(self, request):
         form = AuthenticationForm(request, data=request.POST)
@@ -52,7 +44,7 @@ class RegisterView(View):
         if request.user.is_authenticated:
             return redirect('dashboard')
         form = CustomUserCreationForm()
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'form': form,'hide_navbar': True})
 
     def post(self, request):
         form = CustomUserCreationForm(request.POST)
