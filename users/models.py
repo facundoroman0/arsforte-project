@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
 class User(AbstractUser):
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
 
     email = models.EmailField(unique=True)
     notification_threshold = models.DecimalField(
@@ -26,4 +29,4 @@ class User(AbstractUser):
     )
 
     def __str__(self):
-        return self.username
+        return self.email

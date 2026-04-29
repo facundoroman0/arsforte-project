@@ -1,15 +1,40 @@
+# from django.shortcuts import render, redirect
+# from django.contrib.auth.mixins import LoginRequiredMixin
+# from django.contrib.auth import login, logout
+# from django.contrib.auth.forms import AuthenticationForm
+# from django.contrib import messages
+# from django.views import View
+# from django import forms
+# from decimal import Decimal
+# from django.contrib.auth import get_user_model
+# from .forms import CustomUserCreationForm
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.views import View
-from django import forms
-from decimal import Decimal
-from django.contrib.auth import get_user_model
-from .forms import CustomUserCreationForm
+from .forms import EmailUserCreationForm, EmailAuthenticationForm
+from .models import User
 
-User = get_user_model()
+# class LoginView(View):
+#     template_name = 'users/login.html'
+
+#     def get(self, request):
+#         if request.user.is_authenticated:
+#             return redirect('dashboard')
+#         form = AuthenticationForm()
+#         return render(request, self.template_name, {'form': form,'hide_navbar': True})
+
+#     def post(self, request):
+#         form = AuthenticationForm(request, data=request.POST)
+#         if form.is_valid():
+#             user = form.get_user()
+#             login(request, user)
+#             messages.success(request, f'Bienvenido {user.email}')
+#             return redirect('dashboard')
+#         return render(request, self.template_name, {'form': form})
 
 class LoginView(View):
     template_name = 'users/login.html'
@@ -17,17 +42,23 @@ class LoginView(View):
     def get(self, request):
         if request.user.is_authenticated:
             return redirect('dashboard')
-        form = AuthenticationForm()
-        return render(request, self.template_name, {'form': form,'hide_navbar': True})
+        form = EmailAuthenticationForm()
+        return render(request, self.template_name, {
+            'form': form,
+            'hide_navbar': True
+        })
 
     def post(self, request):
-        form = AuthenticationForm(request, data=request.POST)
+        form = EmailAuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            messages.success(request, f'Bienvenido {user.email}')
+            messages.success(request, f'Bienvenido {user.username}')
             return redirect('dashboard')
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {
+            'form': form,
+            'hide_navbar': True
+        })
 
 
 class LogoutView(View):
@@ -37,24 +68,47 @@ class LogoutView(View):
         return redirect('login')
 
 
+# class RegisterView(View):
+#     template_name = 'users/register.html'
+
+#     def get(self, request):
+#         if request.user.is_authenticated:
+#             return redirect('dashboard')
+#         form = CustomUserCreationForm()
+#         return render(request, self.template_name, {'form': form,'hide_navbar': True})
+
+#     def post(self, request):
+#         form = CustomUserCreationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             login(request, user)
+#             messages.success(request, 'Cuenta creada correctamente')
+#             return redirect('dashboard')
+#         return render(request, self.template_name, {'form': form})
+
 class RegisterView(View):
     template_name = 'users/register.html'
 
     def get(self, request):
         if request.user.is_authenticated:
             return redirect('dashboard')
-        form = CustomUserCreationForm()
-        return render(request, self.template_name, {'form': form,'hide_navbar': True})
+        form = EmailUserCreationForm()
+        return render(request, self.template_name, {
+            'form': form,
+            'hide_navbar': True
+        })
 
     def post(self, request):
-        form = CustomUserCreationForm(request.POST)
+        form = EmailUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, 'Cuenta creada correctamente')
+            messages.success(request, f'Cuenta creada correctamente. Bienvenido {user.username}')
             return redirect('dashboard')
-        return render(request, self.template_name, {'form': form})
-
+        return render(request, self.template_name, {
+            'form': form,
+            'hide_navbar': True
+        })
 
 class NotificationThresholdView(LoginRequiredMixin, View):
     template_name = 'settings.html'
