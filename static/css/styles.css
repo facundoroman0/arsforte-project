@@ -780,7 +780,7 @@ a:hover {
 }
 
 /* Glass Select */
-.glass-input,
+
 select.glass-input,
 .glass-select {
   width: 100%;
