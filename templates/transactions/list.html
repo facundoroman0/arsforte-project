@@ -3,6 +3,11 @@
 
 {% block title %}Transacciones - ArsForte{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static "css/transactions-list.css" %}">
+<link rel="stylesheet" href="{% static "css/transactions-modal-overlay.css" %}">
+{% endblock %}
+
 {% block navbar_actions %}
   <a href="{% url 'dashboard' %}" class="btn btn-ghost">Dashboard</a>
   <a href="{% url 'logout' %}" class="btn btn-ghost">Cerrar sesión</a>
@@ -104,60 +109,8 @@
 </main>
 
 {% include 'transactions/modal_detail.html' %}
+{% block extra_js %}
+<script src="{% static "js/modalDetail.js" %}"></script>
+{% endblock %}
 
-<style>
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-6);
-}
-
-.filters {
-  margin-bottom: var(--space-4);
-  padding: var(--space-4);
-}
-
-.filters-form {
-  display: flex;
-  gap: var(--space-4);
-  align-items: flex-end;
-  flex-wrap: wrap;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.filter-group.search {
-  flex: 1;
-  min-width: 200px;
-}
-
-.filter-group label {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.inline-form {
-  display: inline;
-}
-
-.btn-sm {
-  padding: var(--space-1) var(--space-2);
-  font-size: var(--text-xs);
-}
-
-.actions-cell {
-  display: flex;
-  gap: var(--space-1);
-  align-items: center;
-}
-
-.mt-4 { margin-top: var(--space-4); }
-.mb-6 { margin-bottom: var(--space-6); }
-</style>
 {% endblock %}
