@@ -18,7 +18,7 @@
 
         <div class="mb-3">
           <label for="id_username" class="form-label">Usuario</label>
-          <input type="text" name="username" id="id_username" class="form-control glass" placeholder="Usuario" required>
+          {{ form.username|add_class:"form-control glass"|attr:"Min. 3 caracteres" }}
           {% if form.username.errors %}
             <div class="text-negative small mt-1">{{ form.username.errors }}</div>
           {% endif %}
@@ -26,7 +26,7 @@
 
         <div class="mb-3">
           <label for="id_email" class="form-label">Email</label>
-          <input type="email" name="email" id="id_email" class="form-control glass" placeholder="Email" required>
+          {{ form.email|add_class:"form-control glass"|attr:"placeholder:ejemplo@correo.com" }}
           {% if form.email.errors %}
             <div class="text-negative small mt-1">{{ form.email.errors }}</div>
           {% endif %}
@@ -34,16 +34,16 @@
 
         <div class="mb-3">
           <label for="id_password1" class="form-label">Contraseña</label>
-          <input type="password" name="password1" id="id_password1" class="form-control glass" required>
+          {{ form.password1|add_class:"form-control glass"|attr:"placeholder: Ingrese contraseña" }}
           {% if form.password1.errors %}
             <div class="text-negative small mt-1">{{ form.password1.errors }}</div>
           {% endif %}
-          <small class="text-secondary">Mínimo 8 caracteres</small>
+          {# <small class="text-secondary">Mínimo 8 caracteres</small> #}
         </div>
 
         <div class="mb-3">
           <label for="id_password2" class="form-label">Confirmar Contraseña</label>
-          <input type="password" name="password2" id="id_password2" class="form-control glass" required>
+          {{ form.password2|add_class:"form-control glass"|attr:"placeholder: Repetir contraseña" }}
           {% if form.password2.errors %}
             <div class="text-negative small mt-1">{{ form.password2.errors }}</div>
           {% endif %}

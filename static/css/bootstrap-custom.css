@@ -89,7 +89,7 @@ body {
 
 .form-control.glass,
 .form-select.glass {
-  background: rgba(15, 15, 26, 0.6);
+  background: var(--bg-secondary);
   border-color: var(--glass-border);
   color: #fff;
 }

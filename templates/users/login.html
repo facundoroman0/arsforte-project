@@ -18,7 +18,7 @@
 
         <div class="mb-3">
           <label for="id_username" class="form-label">Email</label>
-          <input type="email" name="username" id="id_username" class="form-control glass" placeholder="Email" required>
+          {{ form.username|add_class:"form-control glass"|attr:"placeholder:ejemplo@correo.com" }}
           {% if form.username.errors %}
             <div class="text-negative small mt-1">{{ form.username.errors }}</div>
           {% endif %}
@@ -26,7 +26,7 @@
 
         <div class="mb-3">
           <label for="id_password" class="form-label">Contraseña</label>
-          <input type="password" name="password" id="id_password" class="form-control glass" placeholder="Contraseña" required>
+          {{ form.password|add_class:"form-control glass"|attr:"placeholder: Ingrese su contraseña" }}
           {% if form.password.errors %}
             <div class="text-negative small mt-1">{{ form.password.errors }}</div>
           {% endif %}
