@@ -126,7 +126,7 @@ body {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 2px solid;
-  border-radius: 5px;
+  border-radius: 50px;
   font-weight: 500;
   font-size: 0.75rem;
   padding: 0.35em 0.65em;
