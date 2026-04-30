@@ -14,7 +14,7 @@
   {% if analysis.days_passed > 0 %}
   <div class="glass mb-3" style="padding: 1rem; border-radius: 12px; border-left: 3px solid #e74c3c;">
     <div class="d-flex justify-content-between align-items-center mb-2">
-      <span class="fw-medium">💸 Valor hoy en pesos</span>
+      <span class="fw-medium">Valor hoy en pesos</span>
       <span class="text-negative">-{{ analysis.inflation_loss_pct|floatformat:1 }}%</span>
     </div>
     <div class="d-flex justify-content-between">
@@ -33,7 +33,7 @@
   {% if alternatives.dollar_blue %}
   <div class="glass mb-3" style="padding: 1rem; border-radius: 12px; border-left: 3px solid {% if alternatives.dollar_blue.gain_loss|default:'0'|add:0 >= 0 %}#10b981{% else %}#e74c3c{% endif %};">
     <div class="d-flex justify-content-between align-items-center mb-2">
-      <span class="fw-medium">💵 Dólar Blue</span>
+      <span class="fw-medium">Dólar Blue</span>
     </div>
     <div class="d-flex justify-content-between">
       <div>
@@ -54,7 +54,7 @@
   {% if alternatives.bitcoin %}
   <div class="glass mb-3" style="padding: 1rem; border-radius: 12px; border-left: 3px solid {% if alternatives.bitcoin.gain_loss|default:'0'|add:0 >= 0 %}#10b981{% else %}#e74c3c{% endif %};">
     <div class="d-flex justify-content-between align-items-center mb-2">
-      <span class="fw-medium">📈 Bitcoin</span>
+      <span class="fw-medium">Bitcoin</span>
     </div>
     <div class="d-flex justify-content-between">
       <div>
@@ -75,7 +75,7 @@
   {% if alternatives.plazo_fijo %}
   <div class="glass mb-3" style="padding: 1rem; border-radius: 12px; border-left: 3px solid {% if alternatives.plazo_fijo.gain_loss|default:'0'|add:0 >= 0 %}#10b981{% else %}#e74c3c{% endif %};">
     <div class="d-flex justify-content-between align-items-center mb-2">
-      <span class="fw-medium">🏦 Plazo Fijo UVA</span>
+      <span class="fw-medium">Plazo Fijo UVA</span>
     </div>
     <div class="d-flex justify-content-between">
       <div>
