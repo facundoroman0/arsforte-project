@@ -94,6 +94,12 @@ body {
   color: #fff;
 }
 
+.form-select.glass {
+  appearance: auto;
+  background-image: none;
+  padding-right: 2.25rem;
+}
+
 .form-control.glass::placeholder {
   color: rgba(255, 255, 255, 0.4);
 }

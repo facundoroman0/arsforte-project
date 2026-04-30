@@ -3,41 +3,19 @@ from django import forms
 from .models import Transaction, TransactionType, Category, InstrumentType
 
 
-# class GlassTextInput(forms.TextInput):
-#     def __init__(self, *args, **kwargs):
-#         kwargs.setdefault('attrs', {})
-#         kwargs['attrs'].setdefault('class', 'glass-input')
-#         super().__init__(*args, **kwargs)
-
-
-# class GlassNumberInput(forms.NumberInput):
-#     def __init__(self, *args, **kwargs):
-#         kwargs.setdefault('attrs', {})
-#         kwargs['attrs'].setdefault('class', 'glass-input')
-#         super().__init__(*args, **kwargs)
-
-
-# class GlassDateInput(forms.DateInput):
-#     def __init__(self, *args, **kwargs):
-#         kwargs.setdefault('attrs', {})
-#         kwargs['attrs'].setdefault('class', 'glass-input')
-#         kwargs['attrs'].setdefault('type', 'date')
-#         super().__init__(*args, **kwargs)
-
-
-# class GlassTextarea(forms.Textarea):
-#     def __init__(self, *args, **kwargs):
-#         kwargs.setdefault('attrs', {})
-#         kwargs['attrs'].setdefault('class', 'glass-input')
-#         kwargs['attrs'].setdefault('rows', 3)
-#         super().__init__(*args, **kwargs)
-
-
 class TransactionForm(forms.ModelForm):
     transaction_type = forms.ChoiceField(
         choices=TransactionType.choices,
-        widget=forms.RadioSelect(),#attrs={'class': 'glass-radio'}
+        widget=forms.RadioSelect(),
         required=True
+    )
+    category = forms.ChoiceField(
+        choices=[('', 'Seleccione una categoría')] + list(Category.choices),
+        required=False
+    )
+    instrument_type = forms.ChoiceField(
+        choices=[('', 'Seleccione un instrumento')] + list(InstrumentType.choices),
+        required=False
     )
 
     def __init__(self, *args, **kwargs):
@@ -48,15 +26,24 @@ class TransactionForm(forms.ModelForm):
 
     class Meta:
         model = Transaction
-        fields = [
-            'date', 'amount', 'transaction_type',
-            'category', 'instrument_type', 'description'
-        ]
-        # widgets = {
-        #     'date': GlassDateInput(),
-        #     'amount': GlassNumberInput(attrs={'step': '0.01', 'min': '0'}),
-        #     'description': GlassTextarea(),
-        # }
+        exclude = ['user']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'amount': forms.NumberInput(attrs={'step': '0.01', 'min': '0'}),
+            'description': forms.Textarea(attrs={'rows': 3}),
+        }
+
+    def clean_category(self):
+        category = self.cleaned_data.get('category')
+        if not category:
+            raise forms.ValidationError('Seleccione una categoría')
+        return category
+
+    def clean_instrument_type(self):
+        instrument = self.cleaned_data.get('instrument_type')
+        if not instrument:
+            raise forms.ValidationError('Seleccione un instrumento')
+        return instrument
 
     def clean_date(self):
         date = self.cleaned_data.get('date')
