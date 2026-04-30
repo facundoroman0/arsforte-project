@@ -4,8 +4,8 @@
 {% block title %}Configuración - ArsForte{% endblock %}
 
 {% block navbar_actions %}
-  <a href="{% url 'dashboard' %}" class="btn btn-sm">Dashboard</a>
-  <a href="{% url 'logout' %}" class="btn btn-sm">Cerrar sesión</a>
+  <a href="{% url 'dashboard' %}" class="btn btn-outline-light rounded-pill btn-sm">Dashboard</a>
+  <a href="{% url 'logout' %}" class="btn btn-outline-light rounded-pill btn-sm">Cerrar sesión</a>
 {% endblock %}
 
 {% block content %}
@@ -46,7 +46,7 @@
           </p>
         </div>
 
-        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <button type="submit" class="btn btn-outline-light rounded-pill">Guardar cambios</button>
       </form>
     </div>
   </div>
@@ -71,7 +71,7 @@
       <p class="text-secondary small mb-3">
         Esta acción es irreversible. Se eliminarán todos tus datos.
       </p>
-      <button class="btn btn-danger">Eliminar mi cuenta</button>
+      <button class="btn btn-outline-light rounded-pill">Eliminar mi cuenta</button>
     </div>
   </div>
 </main>

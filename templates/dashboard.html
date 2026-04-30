@@ -4,9 +4,9 @@
 {% block title %}Dashboard - ArsForte{% endblock %}
 
 {% block navbar_actions %}
-  <a href="{% url 'transactions:list' %}" class="btn btn-sm">Transacciones</a>
-  <a href="{% url 'settings' %}" class="btn btn-sm">Configuración</a>
-  <a href="{% url 'logout' %}" class="btn btn-sm">Cerrar sesión</a>
+  <a href="{% url 'transactions:list' %}" class="btn btn-outline-light rounded-pill btn-sm">Transacciones</a>
+  <a href="{% url 'settings' %}" class="btn btn-outline-light rounded-pill btn-sm">Configuración</a>
+  <a href="{% url 'logout' %}" class="btn btn-outline-light rounded-pill btn-sm">Cerrar sesión</a>
 {% endblock %}
 
 
@@ -187,7 +187,7 @@
         </table>
       </div>
       <div class="text-center mt-3">
-        <a href="{% url 'transactions:list' %}" class="btn btn-outline-light btn-sm">Ver todas las transacciones</a>
+        <a href="{% url 'transactions:list' %}" class="btn btn-outline-light rounded-pill">Ver todas las transacciones</a>
       </div>
     </div>
   </div>
@@ -196,7 +196,7 @@
     <div class="card-body py-5">
       <h3 class="h4 mb-2">No hay transacciones este mes</h3>
       <p class="text-secondary mb-3">Empezá a registrar tus ingresos y gastos para ver tu dashboard.</p>
-      <a href="{% url 'transactions:create' %}" class="btn btn-primary">Agregar primera transacción</a>
+      <a href="{% url 'transactions:create' %}" class="btn btn-outline-light rounded-pill">Agregar primera transacción</a>
     </div>
   </div>
   {% endif %}

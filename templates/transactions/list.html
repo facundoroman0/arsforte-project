@@ -4,15 +4,15 @@
 {% block title %}Transacciones - ArsForte{% endblock %}
 
 {% block navbar_actions %}
-  <a href="{% url 'dashboard' %}" class="btn btn-sm">Dashboard</a>
-  <a href="{% url 'logout' %}" class="btn btn-sm">Cerrar sesión</a>
+  <a href="{% url 'dashboard' %}" class="btn btn-outline-light rounded-pill btn-sm">Dashboard</a>
+  <a href="{% url 'logout' %}" class="btn btn-outline-light rounded-pill btn-sm">Cerrar sesión</a>
 {% endblock %}
 
 {% block content %}
 <main class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 fw-bold">Transacciones</h1>
-    <a href="{% url 'transactions:create' %}" class="btn btn-primary">Nueva Transacción</a>
+    <a href="{% url 'transactions:create' %}" class="btn btn-outline-light rounded-pill">Nueva Transacción</a>
   </div>
 
   <div class="card glass mb-4">
@@ -41,7 +41,7 @@
           <input type="text" name="search" class="form-control glass" placeholder="Buscar..." value="{{ search|default:'' }}">
         </div>
         <div class="col-md-2">
-          <button type="submit" class="btn btn-outline-secondary w-100">Filtrar</button>
+          <button type="submit" class="btn btn-outline-light rounded-pill w-100">Filtrar</button>
         </div>
       </form>
     </div>
@@ -77,11 +77,11 @@
             </td>
             <td>
               <div class="d-flex gap-1">
-                <button type="button" class="btn btn-outline-light btn-sm" onclick="openDetailModal({{ tx.pk }})">Detalle</button>
-                <a href="{% url 'transactions:update' tx.pk %}" class="btn btn-outline-light btn-sm">Editar</a>
+                <button type="button" class="btn btn-outline-light rounded-pill btn-sm" onclick="openDetailModal({{ tx.pk }})">Detalle</button>
+                <a href="{% url 'transactions:update' tx.pk %}" class="btn btn-outline-light rounded-pill btn-sm">Editar</a>
                 <form method="post" action="{% url 'transactions:delete' tx.pk %}" class="d-inline">
                   {% csrf_token %}
-                  <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta transacción?')">Eliminar</button>
+                  <button type="submit" class="btn btn-outline-light rounded-pill btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta transacción?')">Eliminar</button>
                 </form>
               </div>
             </td>
@@ -103,9 +103,9 @@
         {% endif %}
       </p>
       {% if not filter_category and not filter_instrument and not search %}
-      <a href="{% url 'transactions:create' %}" class="btn btn-primary">Agregar primera transacción</a>
+      <a href="{% url 'transactions:create' %}" class="btn btn-outline-light rounded-pill">Agregar primera transacción</a>
       {% else %}
-      <a href="{% url 'transactions:list' %}" class="btn btn-outline-secondary">Limpiar filtros</a>
+      <a href="{% url 'transactions:list' %}" class="btn btn-outline-light rounded-pill">Limpiar filtros</a>
       {% endif %}
     </div>
   </div>
