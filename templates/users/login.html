@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="min-vh-100 d-flex align-items-center justify-content-center p-3">
-  <div class="card" style="max-width: 400px; width: 100%;">
+  <div class="card glass" style="max-width: 400px; width: 100%;">
     <div class="card-body p-4">
       <div class="text-center mb-4">
         <h1 class="h3 fw-bold">ArsForte</h1>
@@ -18,17 +18,17 @@
 
         <div class="mb-3">
           <label for="id_username" class="form-label">Email</label>
-          <input type="email" name="username" id="id_username" class="form-control" placeholder="Email" required>
+          <input type="email" name="username" id="id_username" class="form-control glass" placeholder="Email" required>
           {% if form.username.errors %}
-            <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+            <div class="text-negative small mt-1">{{ form.username.errors }}</div>
           {% endif %}
         </div>
 
         <div class="mb-3">
           <label for="id_password" class="form-label">Contraseña</label>
-          <input type="password" name="password" id="id_password" class="form-control" placeholder="Contraseña" required>
+          <input type="password" name="password" id="id_password" class="form-control glass" placeholder="Contraseña" required>
           {% if form.password.errors %}
-            <div class="text-danger small mt-1">{{ form.password.errors }}</div>
+            <div class="text-negative small mt-1">{{ form.password.errors }}</div>
           {% endif %}
         </div>
 

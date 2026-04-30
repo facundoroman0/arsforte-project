@@ -1,7 +1,7 @@
 {% load static %}
 <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content bg-dark">
+    <div class="modal-content glass">
       <div class="modal-header">
         <h5 class="modal-title" id="detailModalLabel">Detalle de Costo de Oportunidad</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -36,7 +36,7 @@ function openDetailModal(transactionId) {
       modalBody.innerHTML = html;
     })
     .catch(error => {
-      modalBody.innerHTML = '<div class="alert alert-danger">Error al cargar los detalles</div>';
+      modalBody.innerHTML = '<div class="alert glass alert-danger">Error al cargar los detalles</div>';
     });
   
   modal.show();

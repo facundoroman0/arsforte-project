@@ -11,7 +11,7 @@
 <main class="container py-4" style="max-width: 600px; margin: 0 auto;">
   <h1 class="h3 fw-bold mb-4">{{ action }} Transacción</h1>
 
-  <form method="post" class="card">
+  <form method="post" class="card glass">
     <div class="card-body">
       {% csrf_token %}
       
@@ -26,7 +26,7 @@
           {% endfor %}
         </div>
         {% if form.transaction_type.errors %}
-          <div class="text-danger small mt-1">{{ form.transaction_type.errors }}</div>
+          <div class="text-negative small mt-1">{{ form.transaction_type.errors }}</div>
         {% endif %}
       </div>
 
@@ -34,7 +34,7 @@
         <label for="id_amount" class="form-label">Monto *</label>
         {{ form.amount }}
         {% if form.amount.errors %}
-          <div class="text-danger small mt-1">{{ form.amount.errors }}</div>
+          <div class="text-negative small mt-1">{{ form.amount.errors }}</div>
         {% endif %}
       </div>
 
@@ -42,7 +42,7 @@
         <label for="id_date" class="form-label">Fecha *</label>
         {{ form.date }}
         {% if form.date.errors %}
-          <div class="text-danger small mt-1">{{ form.date.errors }}</div>
+          <div class="text-negative small mt-1">{{ form.date.errors }}</div>
         {% endif %}
       </div>
 
@@ -50,7 +50,7 @@
         <label for="id_category" class="form-label">Categoría *</label>
         {{ form.category }}
         {% if form.category.errors %}
-          <div class="text-danger small mt-1">{{ form.category.errors }}</div>
+          <div class="text-negative small mt-1">{{ form.category.errors }}</div>
         {% endif %}
       </div>
 
@@ -58,7 +58,7 @@
         <label for="id_instrument_type" class="form-label">Instrumento *</label>
         {{ form.instrument_type }}
         {% if form.instrument_type.errors %}
-          <div class="text-danger small mt-1">{{ form.instrument_type.errors }}</div>
+          <div class="text-negative small mt-1">{{ form.instrument_type.errors }}</div>
         {% endif %}
       </div>
 
@@ -66,7 +66,7 @@
         <label for="id_description" class="form-label">Descripción</label>
         {{ form.description }}
         {% if form.description.errors %}
-          <div class="text-danger small mt-1">{{ form.description.errors }}</div>
+          <div class="text-negative small mt-1">{{ form.description.errors }}</div>
         {% endif %}
       </div>
 

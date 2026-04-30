@@ -23,10 +23,10 @@
   <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
     {% if prev_month_incomes > 0 %}
     <div class="col">
-      <div class="card bg-secondary bg-opacity-10 border-secondary">
+      <div class="card glass">
         <div class="card-body">
           <small class="text-secondary">Mes anterior ({{ prev_month_name }})</small>
-          <div class="h5 font-mono {% if prev_month_balance < 0 %}text-danger{% else %}text-success{% endif %}">
+          <div class="h5 font-mono {% if prev_month_balance < 0 %}text-negative{% else %}text-positive{% endif %}">
             {{ prev_month_balance|money }}
           </div>
         </div>
@@ -34,10 +34,10 @@
     </div>
     {% endif %}
     <div class="col">
-      <div class="card bg-dark">
+      <div class="card glass">
         <div class="card-body">
           <small class="text-secondary">Ingresos del mes</small>
-          <div class="h4 fw-bold text-success font-mono">
+          <div class="h4 fw-bold text-positive font-mono">
             <span class="ars-value">{{ incomes|money }}</span>
             <span class="usd-value d-none">US$ {{ incomes_usd|default:"0" }}</span>
           </div>
@@ -45,10 +45,10 @@
       </div>
     </div>
     <div class="col">
-      <div class="card bg-dark">
+      <div class="card glass">
         <div class="card-body">
           <small class="text-secondary">Gastos del mes</small>
-          <div class="h4 fw-bold text-danger font-mono">
+          <div class="h4 fw-bold text-negative font-mono">
             <span class="ars-value">{{ expenses|money }}</span>
             <span class="usd-value d-none">US$ {{ expenses_usd|default:"0" }}</span>
           </div>
@@ -56,10 +56,10 @@
       </div>
     </div>
     <div class="col">
-      <div class="card bg-dark">
+      <div class="card glass">
         <div class="card-body">
           <small class="text-secondary">Balance del mes</small>
-          <div class="h4 fw-bold font-mono {% if balance < 0 %}text-danger{% else %}text-success{% endif %}">
+          <div class="h4 fw-bold font-mono {% if balance < 0 %}text-negative{% else %}text-positive{% endif %}">
             <span class="ars-value">{{ balance|money }}</span>
             <span class="usd-value d-none">US$ {{ balance_usd|default:"0" }}</span>
           </div>
@@ -74,7 +74,7 @@
 
   {% if alerts %}
   {% for alert in alerts %}
-  <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
+  <div class="alert glass alert-warning d-flex align-items-center mb-4" role="alert">
     <span class="me-2">⚠️</span>
     <span>{{ alert.message }}</span>
     <a href="{% url 'settings' %}" class="alert-link ms-auto">Ajustar umbral</a>
@@ -85,7 +85,7 @@
   {% if apis_status %}
   <div class="d-flex justify-content-end gap-2 mb-4 flex-wrap">
     {% for api in apis_status %}
-    <span class="badge bg-{% if api.is_healthy %}success{% else %}danger{% endif %}">
+    <span class="badge glass bg-{% if api.is_healthy %}success{% else %}danger{% endif %}">
       {{ api.name }}: {{ api.status }}
     </span>
     {% endfor %}
@@ -93,29 +93,29 @@
   {% endif %}
 
   {% if purchasing_power and purchasing_power.total_income > 0 %}
-  <div class="card mb-4 border-warning bg-warning bg-opacity-10">
+  <div class="card glass mb-4">
     <div class="card-body">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="h5 mb-0">Tu poder adquisitivo real</h2>
-        <span class="badge bg-warning text-dark">{{ purchasing_power.start_date|date:"d/m" }} → hoy</span>
+        <span class="badge glass bg-warning text-dark">{{ purchasing_power.start_date|date:"d/m" }} → hoy</span>
       </div>
       <div class="row row-cols-3 g-3">
         <div class="text-center">
-          <div class="p-3 bg-danger bg-opacity-10 rounded">
+          <div class="p-3 rounded" style="background: rgba(231, 76, 60, 0.1);">
             <small class="text-secondary d-block">En pesos</small>
-            <span class="h5 text-danger">-{{ purchasing_power.inflation_loss_pct|floatformat:1 }}%</span>
+            <span class="h5 text-negative">-{{ purchasing_power.inflation_loss_pct|floatformat:1 }}%</span>
           </div>
         </div>
         <div class="text-center">
-          <div class="p-3 bg-success bg-opacity-10 rounded">
+          <div class="p-3 rounded" style="background: rgba(16, 185, 129, 0.1);">
             <small class="text-secondary d-block">Si dolarizaras</small>
-            <span class="h5 text-success">+{{ purchasing_power.dollar_gain_pct|floatformat:1 }}%</span>
+            <span class="h5 text-positive">+{{ purchasing_power.dollar_gain_pct|floatformat:1 }}%</span>
           </div>
         </div>
         <div class="text-center">
-          <div class="p-3 bg-success bg-opacity-10 rounded">
+          <div class="p-3 rounded" style="background: rgba(16, 185, 129, 0.1);">
             <small class="text-secondary d-block">Si PF UVA</small>
-            <span class="h5 text-success">+{{ purchasing_power.uva_gain_pct|floatformat:1 }}%</span>
+            <span class="h5 text-positive">+{{ purchasing_power.uva_gain_pct|floatformat:1 }}%</span>
           </div>
         </div>
       </div>
@@ -124,26 +124,26 @@
   {% endif %}
 
   {% if opportunity and opportunity.balance_in_pesos > 0 %}
-  <div class="card mb-4">
+  <div class="card glass mb-4">
     <div class="card-body">
       <h2 class="h5 mb-3">Costo de Oportunidad</h2>
       <p class="text-secondary small mb-3">Si hubieras invertido tu balance en pesos ({{ opportunity.balance_in_pesos|money }}) en lugar de mantenerlo:</p>
       <div class="row row-cols-3 g-3">
         <div class="text-center">
           <small class="text-secondary d-block">Dólar Blue</small>
-          <span class="font-mono {% if opportunity.potential_gain_dollar > 0 %}text-success{% else %}text-danger{% endif %}">
+          <span class="font-mono {% if opportunity.potential_gain_dollar > 0 %}text-positive{% else %}text-negative{% endif %}">
             {% if opportunity.potential_gain_dollar > 0 %}+{% endif %}{{ opportunity.potential_gain_dollar|money }}
           </span>
         </div>
         <div class="text-center">
           <small class="text-secondary d-block">Bitcoin</small>
-          <span class="font-mono {% if opportunity.potential_gain_bitcoin > 0 %}text-success{% else %}text-danger{% endif %}">
+          <span class="font-mono {% if opportunity.potential_gain_bitcoin > 0 %}text-positive{% else %}text-negative{% endif %}">
             {% if opportunity.potential_gain_bitcoin > 0 %}+{% endif %}{{ opportunity.potential_gain_bitcoin|money }}
           </span>
         </div>
         <div class="text-center">
           <small class="text-secondary d-block">Plazo Fijo UVA</small>
-          <span class="font-mono {% if opportunity.potential_gain_uva > 0 %}text-success{% else %}text-danger{% endif %}">
+          <span class="font-mono {% if opportunity.potential_gain_uva > 0 %}text-positive{% else %}text-negative{% endif %}">
             {% if opportunity.potential_gain_uva > 0 %}+{% endif %}{{ opportunity.potential_gain_uva|money }}
           </span>
         </div>
@@ -153,11 +153,11 @@
   {% endif %}
   
   {% if recent_transactions %}
-  <div class="card mb-4">
+  <div class="card glass mb-4">
     <div class="card-body">
       <h2 class="h5 mb-3">Transacciones recientes</h2>
       <div class="table-responsive">
-        <table class="table table-dark table-hover mb-0">
+        <table class="table glass mb-0">
           <thead>
             <tr>
               <th>Fecha</th>
@@ -172,13 +172,13 @@
             <tr>
               <td>{{ tx.date|date:"d/m" }}</td>
               <td>
-                <span class="badge bg-{% if tx.transaction_type == 'income' %}success{% else %}danger{% endif %}">
+                <span class="badge glass bg-{% if tx.transaction_type == 'income' %}success{% else %}danger{% endif %}">
                   {% if tx.transaction_type == 'income' %}Ingreso{% else %}Gasto{% endif %}
                 </span>
               </td>
               <td>{{ tx.get_category_display }}</td>
               <td>{{ tx.get_instrument_type_display }}</td>
-              <td class="font-mono {% if tx.transaction_type == 'income' %}text-success{% else %}text-danger{% endif %}">
+              <td class="font-mono {% if tx.transaction_type == 'income' %}text-positive{% else %}text-negative{% endif %}">
                 {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}{{ tx.amount|money }}
               </td>
             </tr>
@@ -192,7 +192,7 @@
     </div>
   </div>
   {% else %}
-  <div class="card text-center">
+  <div class="card glass text-center">
     <div class="card-body py-5">
       <h3 class="h4 mb-2">No hay transacciones este mes</h3>
       <p class="text-secondary mb-3">Empezá a registrar tus ingresos y gastos para ver tu dashboard.</p>

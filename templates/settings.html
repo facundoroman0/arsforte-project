@@ -12,7 +12,7 @@
 <main class="container py-4" style="max-width: 600px;">
   <h1 class="h3 fw-bold mb-4">Configuración</h1>
 
-  <div class="card mb-4">
+  <div class="card glass mb-4">
     <div class="card-body">
       <h2 class="h5 mb-3">Notificaciones</h2>
       <form method="post">
@@ -37,7 +37,7 @@
           </div>
           <div class="d-flex justify-content-between">
             <span class="small text-secondary">10%</span>
-            <span class="badge bg-warning text-dark">{{ user.notification_threshold|floatformat:0 }}%</span>
+            <span class="badge glass bg-warning text-dark">{{ user.notification_threshold|floatformat:0 }}%</span>
             <span class="small text-secondary">90%</span>
           </div>
           
@@ -51,10 +51,10 @@
     </div>
   </div>
 
-  <div class="card mb-4">
+  <div class="card glass mb-4">
     <div class="card-body">
       <h2 class="h5 mb-3">Datos de cuenta</h2>
-      <div class="d-flex justify-content-between py-2 border-bottom">
+      <div class="d-flex justify-content-between py-2 border-bottom border-secondary">
         <span class="text-secondary">Email:</span>
         <span>{{ user.email }}</span>
       </div>
@@ -65,9 +65,9 @@
     </div>
   </div>
 
-  <div class="card border-danger mb-4">
+  <div class="card glass border-danger mb-4">
     <div class="card-body">
-      <h2 class="h5 mb-2 text-danger">Zona de peligro</h2>
+      <h2 class="h5 mb-2 text-negative">Zona de peligro</h2>
       <p class="text-secondary small mb-3">
         Esta acción es irreversible. Se eliminarán todos tus datos.
       </p>

@@ -15,12 +15,12 @@
     <a href="{% url 'transactions:create' %}" class="btn btn-primary">Nueva Transacción</a>
   </div>
 
-  <div class="card mb-4">
+  <div class="card glass mb-4">
     <div class="card-body">
       <form method="get" class="row g-3 align-items-end">
         <div class="col-md-3">
           <label class="form-label">Categoría</label>
-          <select name="category" class="form-select">
+          <select name="category" class="form-select glass">
             <option value="">Todas</option>
             {% for value, label in categories %}
             <option value="{{ value }}" {% if filter_category == value %}selected{% endif %}>{{ label }}</option>
@@ -29,7 +29,7 @@
         </div>
         <div class="col-md-3">
           <label class="form-label">Instrumento</label>
-          <select name="instrument" class="form-select">
+          <select name="instrument" class="form-select glass">
             <option value="">Todos</option>
             {% for value, label in instruments %}
             <option value="{{ value }}" {% if filter_instrument == value %}selected{% endif %}>{{ label }}</option>
@@ -38,7 +38,7 @@
         </div>
         <div class="col-md-4">
           <label class="form-label">Buscar</label>
-          <input type="text" name="search" class="form-control" placeholder="Buscar..." value="{{ search|default:'' }}">
+          <input type="text" name="search" class="form-control glass" placeholder="Buscar..." value="{{ search|default:'' }}">
         </div>
         <div class="col-md-2">
           <button type="submit" class="btn btn-outline-secondary w-100">Filtrar</button>
@@ -48,9 +48,9 @@
   </div>
 
   {% if transactions %}
-  <div class="card">
+  <div class="card glass">
     <div class="table-responsive">
-      <table class="table table-dark table-hover mb-0">
+      <table class="table glass mb-0">
         <thead>
           <tr>
             <th>Fecha</th>
@@ -66,13 +66,13 @@
           <tr>
             <td>{{ tx.date|date:"d/m/Y" }}</td>
             <td>
-              <span class="badge bg-{% if tx.transaction_type == 'income' %}success{% else %}danger{% endif %}">
+              <span class="badge glass bg-{% if tx.transaction_type == 'income' %}success{% else %}danger{% endif %}">
                 {% if tx.transaction_type == 'income' %}Ingreso{% else %}Gasto{% endif %}
               </span>
             </td>
             <td>{{ tx.get_category_display }}</td>
             <td>{{ tx.get_instrument_type_display }}</td>
-            <td class="font-mono {% if tx.transaction_type == 'income' %}text-success{% else %}text-danger{% endif %}">
+            <td class="font-mono {% if tx.transaction_type == 'income' %}text-positive{% else %}text-negative{% endif %}">
               {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}{{ tx.amount|money }}
             </td>
             <td>
@@ -92,7 +92,7 @@
     </div>
   </div>
   {% else %}
-  <div class="card text-center">
+  <div class="card glass text-center">
     <div class="card-body py-5">
       <h3 class="h4 mb-2">No hay transacciones</h3>
       <p class="text-secondary mb-3">
