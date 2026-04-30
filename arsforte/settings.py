@@ -133,3 +133,56 @@ CACHES = {
         'LOCATION': 'arsforte-cache',
     }
 }
+
+
+# Security Settings - Phase 1: Base Security
+
+# HTTPS/SSL (enable in production)
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Content Security
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Session & CSRF Cookies
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_AGE = 3600  # 1 hour
+SESSION_SAVE_EVERY_REQUEST = True
+
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# Disable server signature
+DISABLE_SERVER_SIGNATURE = True
+
+# Security Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'security': {
+            'format': '[%(asctime)s] %(levelname)s - %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+    },
+    'handlers': {
+        'security_file': {
+            'class': 'logging.FileHandler',
+            'filename': 'security.log',
+            'formatter': 'security',
+        },
+    },
+    'loggers': {
+        'security': {
+            'handlers': ['security_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}

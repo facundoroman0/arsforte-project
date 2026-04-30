@@ -10,6 +10,8 @@ from django.http import JsonResponse
 from datetime import date
 from .models import Transaction, TransactionType, Category, InstrumentType
 from .forms import TransactionForm
+from security.decorators import log_access
+from services.opportunity_cost import analyze_transaction
 
 
 def invalidate_dashboard_cache(user_id: int):
@@ -17,7 +19,6 @@ def invalidate_dashboard_cache(user_id: int):
     for month in range(today.month, today.month + 2):
         cache_key = f"dashboard:{user_id}:{today.year}:{month}"
         cache.delete(cache_key)
-from services.opportunity_cost import analyze_transaction
 
 
 class TransactionListView(LoginRequiredMixin, View):
@@ -60,6 +61,7 @@ class TransactionCreateView(LoginRequiredMixin, View):
         context = {'form': form, 'action': 'Crear'}
         return render(request, self.template_name, context)
 
+    @log_access('transaction_created')
     def post(self, request):
         form = TransactionForm(request.POST)
         if form.is_valid():
@@ -96,6 +98,7 @@ class TransactionUpdateView(LoginRequiredMixin, View):
         context = {'form': form, 'action': 'Editar', 'transaction': transaction}
         return render(request, self.template_name, context)
 
+    @log_access('transaction_updated')
     def post(self, request, pk):
         transaction = get_object_or_404(
             Transaction, pk=pk, user=request.user
@@ -131,6 +134,7 @@ class TransactionUpdateView(LoginRequiredMixin, View):
 class TransactionDeleteView(LoginRequiredMixin, View):
     login_url = 'login'
 
+    @log_access('transaction_deleted')
     def post(self, request, pk):
         transaction = get_object_or_404(
             Transaction, pk=pk, user=request.user

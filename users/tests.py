@@ -17,6 +17,7 @@ class AuthTestCase(TestCase):
     def test_user_registration(self):
         response = self.client.post(reverse('register'), {
             'email': 'test@example.com',
+            'username': 'testuser',
             'password1': 'testpassword123',
             'password2': 'testpassword123',
         })
@@ -26,6 +27,7 @@ class AuthTestCase(TestCase):
     def test_user_login(self):
         User.objects.create_user(
             email='test@example.com',
+            username='testuser',
             password='testpassword123'
         )
         response = self.client.post(reverse('login'), {
@@ -41,6 +43,7 @@ class AuthTestCase(TestCase):
     def test_dashboard_accessible_after_login(self):
         user = User.objects.create_user(
             email='test@example.com',
+            username='testuser',
             password='testpassword123'
         )
         self.client.login(email='test@example.com', password='testpassword123')

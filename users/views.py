@@ -9,6 +9,8 @@
 # from django.contrib.auth import get_user_model
 # from .forms import CustomUserCreationForm
 
+from decimal import Decimal
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login, logout
@@ -17,6 +19,7 @@ from django.contrib import messages
 from django.views import View
 from .forms import EmailUserCreationForm, EmailAuthenticationForm
 from .models import User
+from security.decorators import log_access
 
 # class LoginView(View):
 #     template_name = 'users/login.html'
@@ -48,6 +51,7 @@ class LoginView(View):
             'hide_navbar': True
         })
 
+    @log_access('user_login_success')
     def post(self, request):
         form = EmailAuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -62,6 +66,7 @@ class LoginView(View):
 
 
 class LogoutView(View):
+    @log_access('user_logout')
     def get(self, request):
         logout(request)
         messages.info(request, 'Sesión cerrada correctamente')
@@ -98,6 +103,7 @@ class RegisterView(View):
             'hide_navbar': True
         })
 
+    @log_access('user_registered')
     def post(self, request):
         form = EmailUserCreationForm(request.POST)
         if form.is_valid():
@@ -118,6 +124,7 @@ class NotificationThresholdView(LoginRequiredMixin, View):
         user = User.objects.get(pk=request.user.pk)
         return render(request, self.template_name, {'user': user})
 
+    @log_access('settings_updated')
     def post(self, request):
         threshold = request.POST.get('notification_threshold')
         try:

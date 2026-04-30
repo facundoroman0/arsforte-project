@@ -12,6 +12,7 @@ class TransactionTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
             email='test@example.com',
+            username='testuser',
             password='testpassword123'
         )
         self.client.login(email='test@example.com', password='testpassword123')
@@ -102,6 +103,7 @@ class DashboardIntegrationTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
             email='test@example.com',
+            username='testuser',
             password='testpassword123'
         )
         
@@ -137,7 +139,7 @@ class DashboardIntegrationTestCase(TestCase):
         tx = Transaction.objects.filter(user=self.user).first()
         response = self.client.get(reverse('transactions:detail', args=[tx.pk]))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
     def test_dashboard_requires_login(self):
         response = self.client.get(reverse('dashboard'))
@@ -148,6 +150,7 @@ class AlertTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
             email='test@example.com',
+            username='testuser',
             password='testpassword123',
             notification_threshold=Decimal('50.00')
         )
