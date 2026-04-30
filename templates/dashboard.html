@@ -4,47 +4,47 @@
 {% block title %}Dashboard - ArsForte{% endblock %}
 
 {% block navbar_actions %}
-  <a href="{% url 'transactions:list' %}" class="btn btn-ghost">Transacciones</a>
-  <a href="{% url 'settings' %}" class="btn btn-ghost">Configuración</a>
-  <a href="{% url 'logout' %}" class="btn btn-ghost">Cerrar sesión</a>
+  <a href="{% url 'transactions:list' %}" class="c-btn c-btn--ghost">Transacciones</a>
+  <a href="{% url 'settings' %}" class="c-btn c-btn--ghost">Configuración</a>
+  <a href="{% url 'logout' %}" class="c-btn c-btn--ghost">Cerrar sesión</a>
 {% endblock %}
 
 
 {% block content %}
 <main class="container">
-  <div class="dashboard">
-    <div class="dashboard-header">
+  <div class="c-dashboard">
+    <div class="c-dashboard__header">
       <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
-      <div class="currency-toggle">
-        <button id="currency-toggle" class="toggle-btn">
-          <span class="toggle-option" data-currency="ars">ARS</span>
-          <span class="toggle-option" data-currency="usd">USD</span>
+      <div class="c-currency-toggle">
+        <button id="currency-toggle" class="c-toggle-btn">
+          <span class="c-toggle-option" data-currency="ars">ARS</span>
+          <span class="c-toggle-option" data-currency="usd">USD</span>
         </button>
       </div>
     </div>
     
     <div class="metrics-grid">
       {% if prev_month_incomes > 0 %}
-      <div class="glass-card metric-card prev-month-summary">
+      <div class="c-card c-metric-card c-metric-card--prev-month">
         <span class="text-sm text-secondary-text">Mes anterior ({{ prev_month_name }})</span>
         <span class="text-lg font-mono {% if prev_month_balance < 0 %}text-secondary{% else %}text-primary{% endif %}">{{ prev_month_balance|money }}</span>
       </div>
       {% endif %}
-      <div class="glass-card metric-card">
+      <div class="c-card c-metric-card">
         <span class="text-sm text-secondary-text">Ingresos del mes</span>
         <span class="text-2xl font-bold text-primary font-mono">
           <span class="ars-value">{{ incomes|money }}</span>
           <span class="usd-value" style="display:none">US$ {{ incomes_usd|default:"0" }}</span>
         </span>
       </div>
-      <div class="glass-card metric-card">
+      <div class="c-card c-metric-card">
         <span class="text-sm text-secondary-text">Gastos del mes</span>
         <span class="text-2xl font-bold font-mono metric-expense">
           <span class="ars-value">{{ expenses|money }}</span>
           <span class="usd-value" style="display:none">US$ {{ expenses_usd|default:"0" }}</span>
         </span>
       </div>
-      <div class="glass-card metric-card">
+      <div class="c-card c-metric-card">
         <span class="text-sm text-secondary-text">Balance del mes</span>
         <span class="text-2xl font-bold font-mono {% if balance < 0 %}text-secondary{% else %}text-primary{% endif %}">
           <span class="ars-value">{{ balance|money }}</span>
@@ -52,13 +52,13 @@
         </span>
       </div>
     </div>
-    <div class="rate-info">
+    <div class="c-rate-info">
       <span>Dólar oficial: ${{ current_rate|floatformat:0 }}</span>
     </div>
 
     {% if alerts %}
     {% for alert in alerts %}
-    <div class="alert alert-{{ alert.type }} mt-6">
+    <div class="c-alert alert-{{ alert.type }} mt-6">
       <span class="alert-icon">⚠️</span>
       <span>{{ alert.message }}</span>
       <a href="{% url 'settings' %}" class="alert-link">Ajustar umbral</a>
@@ -77,7 +77,7 @@
     {% endif %}
 
     {% comment %} {% if instrument_distribution %}
-    <div class="glass-card mt-6">
+    <div class="c-card mt-6">
       <h2 class="text-lg font-semibold mb-4">Distribución por instrumento</h2>
       <div class="distribution-list">
         {% for item in instrument_distribution %}
@@ -96,7 +96,7 @@
     {% endif %} {% endcomment %}
 
     {% if purchasing_power and purchasing_power.total_income > 0 %}
-    <div class="glass-card mt-6 purchasing-power-card" style="padding: var(--space-6);">
+    <div class="c-card mt-6 purchasing-power-card" style="padding: var(--space-6);">
       <div class="purchasing-power-header">
         <h2 class="text-lg font-semibold">Tu poder adquisitivo real</h2>
         <span class="period-badge">{{ purchasing_power.start_date|date:"d/m" }} → hoy</span>
@@ -119,7 +119,7 @@
     {% endif %}
 
     {% if opportunity and opportunity.balance_in_pesos > 0 %}
-    <div class="glass-card mt-6" style="padding: var(--space-6);">
+    <div class="c-card mt-6" style="padding: var(--space-6);">
       <h2 class="text-lg font-semibold mb-4">Costo de Oportunidad</h2>
       <p class="text-sm text-secondary-text mb-4">Si hubieras invertido tu balance en pesos ({{ opportunity.balance_in_pesos|money }}) en lugar de mantenerlo:</p>
       <div class="opportunity-grid">
@@ -146,7 +146,7 @@
     {% endif %}
     
     {% if recent_transactions %}
-    <div class="glass-card mt-6" style="padding: var(--space-6);">
+    <div class="c-card mt-6" style="padding: var(--space-6);">
       <h2 class="text-lg font-semibold mb-4">Transacciones recientes</h2>
       <table class="table">
         <thead>
@@ -163,7 +163,7 @@
           <tr>
             <td>{{ tx.date|date:"d/m" }}</td>
             <td>
-              <span class="badge badge-{{ tx.transaction_type }}">
+              <span class="c-badge badge-{{ tx.transaction_type }}">
                 {% if tx.transaction_type == 'income' %}Ingreso{% else %}Gasto{% endif %}
               </span>
             </td>
@@ -177,87 +177,20 @@
         </tbody>
       </table>
       <div class="mt-4 text-center">
-        <a href="{% url 'transactions:list' %}" class="btn btn-ghost">Ver todas las transacciones</a>
+        <a href="{% url 'transactions:list' %}" class="c-btn c-btn--ghost">Ver todas las transacciones</a>
       </div>
     </div>
     {% else %}
-    <div class="glass-card mt-6 empty-state">
+    <div class="c-card mt-6 empty-state">
       <div class="empty-state-icon">📊</div>
       <h3 class="empty-state-title">No hay transacciones este mes</h3>
       <p class="text-secondary-text">Empezá a registrar tus ingresos y gastos para ver tu dashboard.</p>
-      <a href="{% url 'transactions:create' %}" class="btn btn-primary mt-4">Agregar primera transacción</a>
+      <a href="{% url 'transactions:create' %}" class="c-btn c-btn--primary mt-4">Agregar primera transacción</a>
     </div>
     {% endif %}
   </div>
 </main>
 
-<style>
-.metric-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-6);
-}
-
-.prev-month-summary {
-  opacity: 0.85;
-  border-left: 3px solid var(--text-secondary);
-}
-
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.currency-toggle {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.toggle-btn {
-  display: flex;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 3px;
-  border: 1px solid var(--glass-border);
-}
-
-.toggle-option {
-  padding: var(--space-2) var(--space-4);
-  border-radius: 8px;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 150ms ease;
-  color: var(--text-secondary);
-}
-
-.toggle-option.active {
-  background: var(--accent-yellow);
-  color: #0f0f1a;
-  font-weight: 600;
-}
-
-.rate-info {
-  text-align: right;
-  font-size: var(--text-xs);
-  color: var(--text-secondary);
-  margin-top: var(--space-2);
-}
-
-.mb-6 { margin-bottom: var(--space-6); }
-.mt-4 { margin-top: var(--space-4); }
-.mt-6 { margin-top: var(--space-6); }
-
-@media (max-width: 768px) {
-  .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-4);
-  }
-}
-</style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const toggle = document.getElementById('currency-toggle');
@@ -268,17 +201,17 @@ document.addEventListener('DOMContentLoaded', function() {
     if (currency === 'usd') {
       arsValues.forEach(el => el.style.display = 'none');
       usdValues.forEach(el => el.style.display = 'inline');
-      toggle.querySelector('[data-currency="ars"]').classList.remove('active');
-      toggle.querySelector('[data-currency="usd"]').classList.add('active');
+      toggle.querySelector('[data-currency="ars"]').classList.remove('c-toggle-option--active');
+      toggle.querySelector('[data-currency="usd"]').classList.add('c-toggle-option--active');
     } else {
       arsValues.forEach(el => el.style.display = 'inline');
       usdValues.forEach(el => el.style.display = 'none');
-      toggle.querySelector('[data-currency="ars"]').classList.add('active');
-      toggle.querySelector('[data-currency="usd"]').classList.remove('active');
+      toggle.querySelector('[data-currency="ars"]').classList.add('c-toggle-option--active');
+      toggle.querySelector('[data-currency="usd"]').classList.remove('c-toggle-option--active');
     }
   }
   
-  toggle.querySelectorAll('.toggle-option').forEach(option => {
+  toggle.querySelectorAll('.c-toggle-option').forEach(option => {
     option.addEventListener('click', function() {
       setCurrency(this.dataset.currency);
     });

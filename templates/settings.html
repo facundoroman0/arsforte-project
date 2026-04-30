@@ -4,164 +4,70 @@
 {% block title %}Configuración - ArsForte{% endblock %}
 
 {% block navbar_actions %}
-  <a href="{% url 'dashboard' %}" class="btn btn-ghost">Dashboard</a>
-  <a href="{% url 'logout' %}" class="btn btn-ghost">Cerrar sesión</a>
+  <a href="{% url 'dashboard' %}" class="c-btn c-btn--ghost">Dashboard</a>
+  <a href="{% url 'logout' %}" class="c-btn c-btn--ghost">Cerrar sesión</a>
 {% endblock %}
 
 {% block content %}
-<main class="container">
-  <div class="settings-container">
-    <h1 class="text-2xl font-bold mb-6">Configuración</h1>
+<main class="container c-settings-container">
+  <h1 class="text-2xl font-bold mb-6">Configuración</h1>
 
-    <div class="glass-card" style="padding: var(--space-6);">
-      <h2 class="text-lg font-semibold mb-4">Notificaciones</h2>
-      <form method="post" class="settings-form">
-        {% csrf_token %}
+  <div class="c-card" style="padding: var(--space-6);">
+    <h2 class="text-lg font-semibold mb-4">Notificaciones</h2>
+    <form method="post" class="c-settings-form">
+      {% csrf_token %}
+      
+      <div class="c-form-group">
+        <label for="id_threshold">Alerta de riesgo en pesos</label>
+        <p class="text-sm text-secondary-text mb-3">
+          Notificarme cuando el porcentaje en pesos supere:
+        </p>
         
-        <div class="form-group">
-          <label for="id_threshold">Alerta de riesgo en pesos</label>
-          <p class="text-sm text-secondary-text mb-3">
-            Notificarme cuando el porcentaje en pesos supere:
-          </p>
-          
-          <div class="slider-container">
-            <input 
-              type="range" 
-              name="notification_threshold" 
-              id="id_threshold" 
-              min="10" 
-              max="90" 
-              value="{{ user.notification_threshold }}"
-              class="glass-slider"
-            >
-            <div class="slider-labels">
-              <span>10%</span>
-              <span class="slider-value">{{ user.notification_threshold|floatformat:0 }}%</span>
-              <span>90%</span>
-            </div>
+        <div class="c-slider-container">
+          <input 
+            type="range" 
+            name="notification_threshold" 
+            id="id_threshold" 
+            min="10" 
+            max="90" 
+            value="{{ user.notification_threshold }}"
+            class="c-slider"
+          >
+          <div class="c-slider-labels">
+            <span>10%</span>
+            <span class="c-slider-value">{{ user.notification_threshold|floatformat:0 }}%</span>
+            <span>90%</span>
           </div>
-          
-          <p class="text-sm text-secondary-text mt-2">
-            Preview: "Tenés más del {{ user.notification_threshold|floatformat:0 }}% en pesos"
-          </p>
         </div>
-
-        <button type="submit" class="btn btn-primary mt-4">Guardar cambios</button>
-      </form>
-    </div>
-
-    <div class="glass-card mt-6" style="padding: var(--space-6);">
-      <h2 class="text-lg font-semibold mb-4">Datos de cuenta</h2>
-      <div class="info-row">
-        <span class="text-secondary-text">Email:</span>
-        <span>{{ user.email }}</span>
+        
+        <p class="text-sm text-secondary-text mt-2">
+          Preview: "Tenés más del {{ user.notification_threshold|floatformat:0 }}% en pesos"
+        </p>
       </div>
-      <div class="info-row">
-        <span class="text-secondary-text">Miembro desde:</span>
-        <span>{{ user.date_joined|date:"d F Y" }}</span>
-      </div>
-    </div>
 
-    <div class="glass-card mt-6 danger-zone" style="padding: var(--space-6);">
-      <h2 class="text-lg font-semibold mb-4 text-secondary">Zona de peligro</h2>
-      <p class="text-sm text-secondary-text mb-4">
-        Esta acción es irreversible. Se eliminarán todos tus datos.
-      </p>
-      <button class="btn btn-danger">Eliminar mi cuenta</button>
+      <button type="submit" class="c-btn c-btn--primary mt-4">Guardar cambios</button>
+    </form>
+  </div>
+
+  <div class="c-card mt-6" style="padding: var(--space-6);">
+    <h2 class="text-lg font-semibold mb-4">Datos de cuenta</h2>
+    <div class="c-info-row">
+      <span class="text-secondary-text">Email:</span>
+      <span>{{ user.email }}</span>
+    </div>
+    <div class="c-info-row">
+      <span class="text-secondary-text">Miembro desde:</span>
+      <span>{{ user.date_joined|date:"d F Y" }}</span>
     </div>
   </div>
+
+  <div class="c-card mt-6 c-danger-zone" style="padding: var(--space-6);">
+    <h2 class="text-lg font-semibold mb-4 text-secondary">Zona de peligro</h2>
+    <p class="text-sm text-secondary-text mb-4">
+      Esta acción es irreversible. Se eliminarán todos tus datos.
+    </p>
+    <button class="c-btn c-btn--danger">Eliminar mi cuenta</button>
+  </div>
 </main>
-
-<style>
-.settings-container {
-  max-width: 600px;
-}
-
-.settings-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.form-group label {
-  font-weight: 500;
-  color: var(--text-secondary);
-  font-size: var(--text-sm);
-}
-
-.slider-container {
-  padding: var(--space-4) 0;
-}
-
-.glass-slider {
-  width: 100%;
-  height: 8px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  outline: none;
-  -webkit-appearance: none;
-}
-
-.glass-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--accent-yellow-bright);
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(244, 208, 63, 0.4);
-}
-
-.glass-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--accent-yellow-bright);
-  cursor: pointer;
-  border: none;
-}
-
-.slider-labels {
-  display: flex;
-  justify-content: space-between;
-  margin-top: var(--space-2);
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.slider-value {
-  font-weight: 600;
-  color: var(--accent-yellow-bright);
-}
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--space-2) 0;
-  border-bottom: 1px solid var(--glass-border);
-}
-
-.info-row:last-child {
-  border-bottom: none;
-}
-
-.info-row span:last-child {
-  color: var(--text-primary);
-}
-
-.danger-zone {
-  border-color: rgba(231, 76, 60, 0.3);
-}
-
-.mt-4 { margin-top: var(--space-4); }
-.mt-6 { margin-top: var(--space-6); }
-.mb-4 { margin-bottom: var(--space-4); }
-.mb-6 { margin-bottom: var(--space-6); }
-</style>
+{% endblock %}
 {% endblock %}

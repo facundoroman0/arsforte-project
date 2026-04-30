@@ -4,52 +4,51 @@
 {% block title %}Transacciones - ArsForte{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static "css/transactions-list.css" %}">
-<link rel="stylesheet" href="{% static "css/transactions-modal-overlay.css" %}">
+<link rel="stylesheet" href="{% static "css/styles.css" %}">
 {% endblock %}
 
 {% block navbar_actions %}
-  <a href="{% url 'dashboard' %}" class="btn btn-ghost">Dashboard</a>
-  <a href="{% url 'logout' %}" class="btn btn-ghost">Cerrar sesión</a>
+  <a href="{% url 'dashboard' %}" class="c-btn c-btn--ghost">Dashboard</a>
+  <a href="{% url 'logout' %}" class="c-btn c-btn--ghost">Cerrar sesión</a>
 {% endblock %}
 
 {% block content %}
 <main class="container">
-  <div class="page-header">
+  <div class="c-page-header">
     <h1 class="text-2xl font-bold">Transacciones</h1>
-    <a href="{% url 'transactions:create' %}" class="btn btn-primary">Nueva Transacción</a>
+    <a href="{% url 'transactions:create' %}" class="c-btn c-btn--primary">Nueva Transacción</a>
   </div>
 
-  <div class="glass-card filters">
-    <form method="get" class="filters-form">
-      <div class="filter-group">
+  <div class="c-card c-filters">
+    <form method="get" class="c-filters-form">
+      <div class="c-filter-group">
         <label>Categoría</label>
-        <select name="category" class="glass-input">
+        <select name="category" class="c-form-input">
           <option value="">Todas</option>
           {% for value, label in categories %}
           <option value="{{ value }}" {% if filter_category == value %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
         </select>
       </div>
-      <div class="filter-group">
+      <div class="c-filter-group">
         <label>Instrumento</label>
-        <select name="instrument" class="glass-input">
+        <select name="instrument" class="c-form-input">
           <option value="">Todos</option>
           {% for value, label in instruments %}
           <option value="{{ value }}" {% if filter_instrument == value %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
         </select>
       </div>
-      <div class="filter-group search">
+      <div class="c-filter-group c-filter-group--search">
         <label>Buscar</label>
-        <input type="text" name="search" class="glass-input" placeholder="Buscar..." value="{{ search|default:'' }}">
+        <input type="text" name="search" class="c-form-input" placeholder="Buscar..." value="{{ search|default:'' }}">
       </div>
-      <button type="submit" class="btn btn-secondary">Filtrar</button>
+      <button type="submit" class="c-btn c-btn--secondary">Filtrar</button>
     </form>
   </div>
 
   {% if transactions %}
-  <div class="glass-card">
+  <div class="c-card">
     <table class="table">
       <thead>
         <tr>
@@ -66,21 +65,21 @@
         <tr>
           <td>{{ tx.date|date:"d/m/Y" }}</td>
           <td>
-            <span class="badge badge-{{ tx.transaction_type }}">
+            <span class="c-badge badge-{{ tx.transaction_type }}">
               {% if tx.transaction_type == 'income' %}Ingreso{% else %}Gasto{% endif %}
             </span>
           </td>
           <td>{{ tx.get_category_display }}</td>
           <td>{{ tx.get_instrument_type_display }}</td>
-            <td class="font-mono {% if tx.transaction_type == 'income' %}text-primary{% else %}text-secondary{% endif %}">
+            <td class="font-mono {% if tx.transaction_type == 'income' %}text-gain{% else %}text-loss{% endif %}">
             {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}{{ tx.amount|money }}
           </td>
-          <td class="actions-cell">
-            <button type="button" class="btn btn-ghost btn-sm" onclick="openDetailModal({{ tx.pk }})">Detalle</button>
-            <a href="{% url 'transactions:update' tx.pk %}" class="btn btn-ghost btn-sm">Editar</a>
-            <form method="post" action="{% url 'transactions:delete' tx.pk %}" class="inline-form">
+          <td class="c-actions-cell">
+            <button type="button" class="c-btn c-btn--ghost c-btn--sm" onclick="openDetailModal({{ tx.pk }})">Detalle</button>
+            <a href="{% url 'transactions:update' tx.pk %}" class="c-btn c-btn--ghost c-btn--sm">Editar</a>
+            <form method="post" action="{% url 'transactions:delete' tx.pk %}" class="c-inline-form">
               {% csrf_token %}
-              <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta transacción?')">Eliminar</button>
+              <button type="submit" class="c-btn c-btn--danger c-btn--sm" onclick="return confirm('¿Estás seguro de eliminar esta transacción?')">Eliminar</button>
             </form>
           </td>
         </tr>
@@ -89,7 +88,7 @@
     </table>
   </div>
   {% else %}
-  <div class="glass-card empty-state">
+  <div class="c-card empty-state">
     <div class="empty-state-icon">💸</div>
     <h3 class="empty-state-title">No hay transacciones</h3>
     <p class="text-secondary-text">
@@ -100,9 +99,9 @@
       {% endif %}
     </p>
     {% if not filter_category and not filter_instrument and not search %}
-    <a href="{% url 'transactions:create' %}" class="btn btn-primary mt-4">Agregar primera transacción</a>
+    <a href="{% url 'transactions:create' %}" class="c-btn c-btn--primary mt-4">Agregar primera transacción</a>
     {% else %}
-    <a href="{% url 'transactions:list' %}" class="btn btn-secondary mt-4">Limpiar filtros</a>
+    <a href="{% url 'transactions:list' %}" class="c-btn c-btn--secondary mt-4">Limpiar filtros</a>
     {% endif %}
   </div>
   {% endif %}
