@@ -7,6 +7,8 @@ from django.views import View
 from django.contrib import messages
 from django.db.models import Q
 from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
 from datetime import date
 from .models import Transaction, TransactionType, Category, InstrumentType
 from .forms import TransactionForm
@@ -52,6 +54,7 @@ class TransactionListView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
 
+@method_decorator(ratelimit(key='ip', rate='20/m', method='POST', block=True), name='post')
 class TransactionCreateView(LoginRequiredMixin, View):
     template_name = 'transactions/form.html'
     login_url = 'login'
@@ -86,6 +89,7 @@ class TransactionCreateView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
 
+@method_decorator(ratelimit(key='ip', rate='20/m', method='POST', block=True), name='post')
 class TransactionUpdateView(LoginRequiredMixin, View):
     template_name = 'transactions/form.html'
     login_url = 'login'
@@ -131,6 +135,7 @@ class TransactionUpdateView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
 
+@method_decorator(ratelimit(key='ip', rate='20/m', method='POST', block=True), name='post')
 class TransactionDeleteView(LoginRequiredMixin, View):
     login_url = 'login'
 

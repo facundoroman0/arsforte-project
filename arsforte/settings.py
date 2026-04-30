@@ -129,8 +129,9 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'arsforte-cache',
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': config('REDIS_URL', default='redis://localhost:6379/0'),
+        'KEY_PREFIX': 'arsforte',
     }
 }
 
@@ -186,3 +187,9 @@ LOGGING = {
         },
     },
 }
+
+
+# Rate Limiting Settings (django-ratelimit)
+RATELIMIT_USE_CACHE = 'default'
+RATELIMIT_CACHE_PREFIX = 'rl:'
+RATELIMIT_ENABLE = not DEBUG  # Enable in production, disable in development

@@ -17,6 +17,8 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.views import View
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
 from .forms import EmailUserCreationForm, EmailAuthenticationForm
 from .models import User
 from security.decorators import log_access
@@ -39,6 +41,7 @@ from security.decorators import log_access
 #             return redirect('dashboard')
 #         return render(request, self.template_name, {'form': form})
 
+@method_decorator(ratelimit(key='ip', rate='5/m', method='POST', block=False), name='post')
 class LoginView(View):
     template_name = 'users/login.html'
 
@@ -53,6 +56,14 @@ class LoginView(View):
 
     @log_access('user_login_success')
     def post(self, request):
+        if getattr(request, 'limited', False):
+            messages.warning(request, 'Demasiados intentos de login. Intenta en 1 minuto.')
+            form = EmailAuthenticationForm()
+            return render(request, self.template_name, {
+                'form': form,
+                'hide_navbar': True
+            })
+        
         form = EmailAuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
@@ -91,6 +102,7 @@ class LogoutView(View):
 #             return redirect('dashboard')
 #         return render(request, self.template_name, {'form': form})
 
+@method_decorator(ratelimit(key='ip', rate='3/h', method='POST', block=True), name='post')
 class RegisterView(View):
     template_name = 'users/register.html'
 
