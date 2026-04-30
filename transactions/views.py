@@ -1,13 +1,22 @@
 from datetime import date
 
+from django.core.cache import cache
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.contrib import messages
 from django.db.models import Q
 from django.http import JsonResponse
-from .models import Transaction, Category, InstrumentType
+from datetime import date
+from .models import Transaction, TransactionType, Category, InstrumentType
 from .forms import TransactionForm
+
+
+def invalidate_dashboard_cache(user_id: int):
+    today = date.today()
+    for month in range(today.month, today.month + 2):
+        cache_key = f"dashboard:{user_id}:{today.year}:{month}"
+        cache.delete(cache_key)
 from services.opportunity_cost import analyze_transaction
 
 
@@ -64,6 +73,7 @@ class TransactionCreateView(LoginRequiredMixin, View):
             transaction.exchange_rate_uva = rates.uva
             
             transaction.save()
+            invalidate_dashboard_cache(request.user.id)
             
             if hasattr(form, 'warning_message'):
                 messages.warning(request, form.warning_message)
@@ -107,6 +117,8 @@ class TransactionUpdateView(LoginRequiredMixin, View):
                     'exchange_rate_uva'
                 ])
             
+            invalidate_dashboard_cache(request.user.id)
+
             if hasattr(form, 'warning_message'):
                 messages.warning(request, form.warning_message)
             else:
@@ -124,6 +136,7 @@ class TransactionDeleteView(LoginRequiredMixin, View):
             Transaction, pk=pk, user=request.user
         )
         transaction.delete()
+        invalidate_dashboard_cache(request.user.id)
         messages.success(request, 'Transacción eliminada correctamente')
         return redirect('transactions:list')
 

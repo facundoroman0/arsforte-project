@@ -22,6 +22,7 @@ from services import (
     bcra_service,
     historical_rates,
 )
+from services.cache import cached
 
 
 @dataclass

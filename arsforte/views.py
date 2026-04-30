@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
+from django.core.cache import cache
 from decimal import Decimal
 from datetime import date, timedelta
 from transactions.models import Transaction, TransactionType
@@ -24,16 +25,29 @@ def calculate_usd_values(incomes: Decimal, expenses: Decimal, balance: Decimal, 
     return {'incomes_usd': Decimal('0'), 'expenses_usd': Decimal('0'), 'balance_usd': Decimal('0')}
 
 
+def get_dashboard_cache_key(user_id: int, month_start: date) -> str:
+    return f"dashboard:{user_id}:{month_start.year}:{month_start.month}"
+
+
 class DashboardView(LoginRequiredMixin, View):
     template_name = 'dashboard.html'
     login_url = 'login'
+    cache_ttl = 300
 
     def get(self, request):
         today = date.today()
         month_start = today.replace(day=1)
         year_start = get_year_start()
         
-        transactions = Transaction.objects.filter(user=request.user)
+        cache_key = get_dashboard_cache_key(request.user.id, month_start)
+        cached_context = cache.get(cache_key)
+        
+        if cached_context is not None:
+            context = cached_context.copy()
+            context['cached'] = True
+            return render(request, self.template_name, context)
+        
+        transactions = Transaction.objects.filter(user=request.user).select_related()
         month_transactions = transactions.filter(date__gte=month_start, date__lte=today)
         rates = exchange_rates.get_current_exchange_rates()
         
@@ -106,5 +120,9 @@ class DashboardView(LoginRequiredMixin, View):
             'prev_month_expenses': prev_expenses,
             'prev_month_balance': prev_balance,
             'prev_month_name': first_day_prev.strftime('%B'),
+            'cached': False,
         }
+        
+        cache.set(cache_key, context, self.cache_ttl)
+        
         return render(request, self.template_name, context)
