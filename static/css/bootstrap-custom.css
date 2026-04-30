@@ -4,17 +4,20 @@
   --color-orange: #FFA62B;
   --color-negative: #e74c3c;
   --color-positive: #10b981;
-  --bg-base: #0f0f1a;
 
-  /* Glass */
-  --glass-bg: rgba(26, 26, 46, 0.7);
+  /* Background - Gris neutro (menos azulado) */
+  --bg-base: #0c0c0f;
+  --bg-secondary: #161618;
+
+  /* Glass - Más gris neutro */
+  --glass-bg: rgba(24, 24, 28, 0.7);
   --glass-border: rgba(255, 255, 255, 0.05);
   --glass-blur: 10px;
 }
 
-/* Background */
+/* Background - Gris más claro con acentos sutiles */
 body {
-  background: linear-gradient(135deg, var(--bg-base) 0%, #1a1a2e 50%, var(--bg-base) 100%);
+  background: linear-gradient(135deg, var(--bg-base), var(--bg-secondary));
   background-attachment: fixed;
   min-height: 100vh;
 }
@@ -32,8 +35,35 @@ body {
   border-radius: 12px;
 }
 
+/* Navbar - Fondo sólido con divisor */
 .navbar.glass {
-  background: rgba(15, 15, 26, 0.8);
+  background: #121214;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.navbar-brand {
+  color: var(--color-cyan);
+}
+
+/* Navbar items */
+.navbar .btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.4rem 0.8rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.navbar .btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.navbar .btn:active {
+  background: rgba(52, 209, 191, 0.15);
+  color: var(--color-cyan);
 }
 
 .form-control.glass,
@@ -65,7 +95,9 @@ body {
 }
 
 .badge.glass {
-  background: rgba(26, 26, 46, 0.8);
+  background: rgba(15, 15, 26, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--glass-border);
 }
 
