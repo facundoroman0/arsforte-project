@@ -1,17 +1,51 @@
 {% load static %}
-<div class="c-modal-overlay" id="detailModal">
-  <div class="c-modal-content">
-    <div class="c-modal__header">
-      <h2>Detalle de Costo de Oportunidad</h2>
-      <button class="c-modal__close" onclick="closeModal()">&times;</button>
-    </div>
-    
-    <div class="c-modal__body" id="modalBody">
-      <div class="c-loading">Cargando...</div>
-    </div>
-    
-    <div class="c-modal__footer">
-      <button class="c-btn c-btn--secondary" onclick="closeModal()">Cerrar</button>
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content bg-dark">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailModalLabel">Detalle de Costo de Oportunidad</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body" id="modalBody">
+        <div class="text-center py-5">
+          <div class="spinner-border text-secondary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <p class="mt-2 text-secondary">Cargando...</p>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
     </div>
   </div>
 </div>
+
+<script>
+function openDetailModal(transactionId) {
+  const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+  const modalBody = document.getElementById('modalBody');
+  
+  modalBody.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-secondary" role="status"><span class="visually-hidden">Cargando...</span></div><p class="mt-2 text-secondary">Cargando...</p></div>';
+  
+  fetch(`/transactions/${transactionId}/detail/`)
+    .then(response => response.text())
+    .then(html => {
+      modalBody.innerHTML = html;
+    })
+    .catch(error => {
+      modalBody.innerHTML = '<div class="alert alert-danger">Error al cargar los detalles</div>';
+    });
+  
+  modal.show();
+}
+
+function closeModal() {
+  const modal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+  if (modal) {
+    modal.hide();
+  }
+}
+</script>

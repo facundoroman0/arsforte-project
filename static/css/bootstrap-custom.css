@@ -1,0 +1,42 @@
+:root {
+  --bs-body-bg: #0f0f1a;
+  --bs-body-color: #fff;
+  --bs-border-color: #1a1a1a;
+}
+
+body {
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+.card {
+  --bs-card-bg: #1a1a2e;
+  --bs-card-border-color: #1a1a1a;
+}
+
+.form-control,
+.form-select {
+  background-color: #090912;
+  border-color: #1a1a1a;
+  color: #fff;
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: #0c0c18;
+  border-color: #5dade2;
+  box-shadow: 0 0 0 0.2rem #1a3a4a;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.text-income {
+  color: #10b981;
+}
+
+.text-expense {
+  color: #e74c3c;
+}

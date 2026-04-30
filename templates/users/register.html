@@ -2,59 +2,61 @@
 {% load static %}
 {% load widget_tweaks %}
 
-{% block title %} Registrarse - ArsForte{% endblock %}
+{% block title %}Registrarse - ArsForte{% endblock %}
 
 {% block content %}
-<div class="c-auth-container">
-  <div class="c-auth-card c-card">
-    <div class="c-auth-header">
-      <h1 class="text-2xl font-bold">ArsForte</h1>
-      <p class="text-secondary-text">Crear tu cuenta</p>
-    </div>
-
-    <form method="post" class="c-auth-form">
-      {% csrf_token %}
-
-      <div class="c-form-group">
-        <label for="id_username">Usuario</label>
-        {{ form.username|add_class:"c-form-input"|attr:"placeholder:Usuario" }}
-        {% if form.username.errors %}
-          <span class="c-form-error">{{ form.username.errors }}</span>
-        {% endif %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center p-3">
+  <div class="card" style="max-width: 400px; width: 100%;">
+    <div class="card-body p-4">
+      <div class="text-center mb-4">
+        <h1 class="h3 fw-bold">ArsForte</h1>
+        <p class="text-secondary">Crear tu cuenta</p>
       </div>
 
-      <div class="c-form-group">
-        <label for="id_email">Email</label>
-        {{ form.email|add_class:"c-form-input"|attr:"placeholder:Email" }}
-        {% if form.email.errors %}
-          <span class="c-form-error">{{ form.email.errors }}</span>
-        {% endif %}
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <label for="id_username" class="form-label">Usuario</label>
+          <input type="text" name="username" id="id_username" class="form-control" placeholder="Usuario" required>
+          {% if form.username.errors %}
+            <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_email" class="form-label">Email</label>
+          <input type="email" name="email" id="id_email" class="form-control" placeholder="Email" required>
+          {% if form.email.errors %}
+            <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_password1" class="form-label">Contraseña</label>
+          <input type="password" name="password1" id="id_password1" class="form-control" required>
+          {% if form.password1.errors %}
+            <div class="text-danger small mt-1">{{ form.password1.errors }}</div>
+          {% endif %}
+          <small class="text-secondary">Mínimo 8 caracteres</small>
+        </div>
+
+        <div class="mb-3">
+          <label for="id_password2" class="form-label">Confirmar Contraseña</label>
+          <input type="password" name="password2" id="id_password2" class="form-control" required>
+          {% if form.password2.errors %}
+            <div class="text-danger small mt-1">{{ form.password2.errors }}</div>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">
+          Crear Cuenta
+        </button>
+      </form>
+
+      <div class="text-center mt-4">
+        <p class="text-secondary small mb-0">¿Ya tenés cuenta? <a href="{% url 'login' %}">Iniciar sesión</a></p>
       </div>
-
-      <div class="c-form-group">
-        <label for="id_password1">Contraseña</label>
-        {{ form.password1|add_class:"c-form-input" }}
-        {% if form.password1.errors %}
-          <span class="c-form-error">{{ form.password1.errors }}</span>
-        {% endif %}
-        <span class="c-form-help">Mínimo 8 caracteres</span>
-      </div>
-
-      <div class="c-form-group">
-        <label for="id_password2">Confirmar Contraseña</label>
-        {{ form.password2|add_class:"c-form-input" }}
-        {% if form.password2.errors %}
-          <span class="c-form-error">{{ form.password2.errors }}</span>
-        {% endif %}
-      </div>
-
-      <button type="submit" class="c-btn c-btn--primary c-auth-btn">
-        Crear Cuenta
-      </button>
-    </form>
-
-    <div class="c-auth-footer">
-      <p>¿Ya tenés cuenta? <a href="{% url 'login' %}">Iniciar sesión</a></p>
     </div>
   </div>
 </div>

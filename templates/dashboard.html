@@ -4,215 +4,236 @@
 {% block title %}Dashboard - ArsForte{% endblock %}
 
 {% block navbar_actions %}
-  <a href="{% url 'transactions:list' %}" class="c-btn c-btn--ghost">Transacciones</a>
-  <a href="{% url 'settings' %}" class="c-btn c-btn--ghost">Configuración</a>
-  <a href="{% url 'logout' %}" class="c-btn c-btn--ghost">Cerrar sesión</a>
+  <a href="{% url 'transactions:list' %}" class="btn btn-outline-light btn-sm">Transacciones</a>
+  <a href="{% url 'settings' %}" class="btn btn-outline-light btn-sm">Configuración</a>
+  <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Cerrar sesión</a>
 {% endblock %}
 
 
 {% block content %}
-<main class="container">
-  <div class="c-dashboard">
-    <div class="c-dashboard__header">
-      <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
-      <div class="c-currency-toggle">
-        <button id="currency-toggle" class="c-toggle-btn">
-          <span class="c-toggle-option" data-currency="ars">ARS</span>
-          <span class="c-toggle-option" data-currency="usd">USD</span>
-        </button>
+<main class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 fw-bold">Dashboard</h1>
+    <div class="btn-group" role="group" aria-label="Currency toggle">
+      <button type="button" class="btn btn-outline-warning btn-sm currency-btn active" data-currency="ars">ARS</button>
+      <button type="button" class="btn btn-outline-warning btn-sm currency-btn" data-currency="usd">USD</button>
+    </div>
+  </div>
+  
+  <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+    {% if prev_month_incomes > 0 %}
+    <div class="col">
+      <div class="card bg-secondary bg-opacity-10 border-secondary">
+        <div class="card-body">
+          <small class="text-secondary">Mes anterior ({{ prev_month_name }})</small>
+          <div class="h5 font-mono {% if prev_month_balance < 0 %}text-danger{% else %}text-success{% endif %}">
+            {{ prev_month_balance|money }}
+          </div>
+        </div>
       </div>
     </div>
-    
-    <div class="metrics-grid">
-      {% if prev_month_incomes > 0 %}
-      <div class="c-card c-metric-card c-metric-card--prev-month">
-        <span class="text-sm text-secondary-text">Mes anterior ({{ prev_month_name }})</span>
-        <span class="text-lg font-mono {% if prev_month_balance < 0 %}text-secondary{% else %}text-primary{% endif %}">{{ prev_month_balance|money }}</span>
-      </div>
-      {% endif %}
-      <div class="c-card c-metric-card">
-        <span class="text-sm text-secondary-text">Ingresos del mes</span>
-        <span class="text-2xl font-bold text-primary font-mono">
-          <span class="ars-value">{{ incomes|money }}</span>
-          <span class="usd-value" style="display:none">US$ {{ incomes_usd|default:"0" }}</span>
-        </span>
-      </div>
-      <div class="c-card c-metric-card">
-        <span class="text-sm text-secondary-text">Gastos del mes</span>
-        <span class="text-2xl font-bold font-mono metric-expense">
-          <span class="ars-value">{{ expenses|money }}</span>
-          <span class="usd-value" style="display:none">US$ {{ expenses_usd|default:"0" }}</span>
-        </span>
-      </div>
-      <div class="c-card c-metric-card">
-        <span class="text-sm text-secondary-text">Balance del mes</span>
-        <span class="text-2xl font-bold font-mono {% if balance < 0 %}text-secondary{% else %}text-primary{% endif %}">
-          <span class="ars-value">{{ balance|money }}</span>
-          <span class="usd-value" style="display:none">US$ {{ balance_usd|default:"0" }}</span>
-        </span>
+    {% endif %}
+    <div class="col">
+      <div class="card bg-dark">
+        <div class="card-body">
+          <small class="text-secondary">Ingresos del mes</small>
+          <div class="h4 fw-bold text-success font-mono">
+            <span class="ars-value">{{ incomes|money }}</span>
+            <span class="usd-value d-none">US$ {{ incomes_usd|default:"0" }}</span>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="c-rate-info">
-      <span>Dólar oficial: ${{ current_rate|floatformat:0 }}</span>
+    <div class="col">
+      <div class="card bg-dark">
+        <div class="card-body">
+          <small class="text-secondary">Gastos del mes</small>
+          <div class="h4 fw-bold text-danger font-mono">
+            <span class="ars-value">{{ expenses|money }}</span>
+            <span class="usd-value d-none">US$ {{ expenses_usd|default:"0" }}</span>
+          </div>
+        </div>
+      </div>
     </div>
+    <div class="col">
+      <div class="card bg-dark">
+        <div class="card-body">
+          <small class="text-secondary">Balance del mes</small>
+          <div class="h4 fw-bold font-mono {% if balance < 0 %}text-danger{% else %}text-success{% endif %}">
+            <span class="ars-value">{{ balance|money }}</span>
+            <span class="usd-value d-none">US$ {{ balance_usd|default:"0" }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="text-end mb-4">
+    <small class="text-secondary">Dólar oficial: ${{ current_rate|floatformat:0 }}</small>
+  </div>
 
-    {% if alerts %}
-    {% for alert in alerts %}
-    <div class="c-alert alert-{{ alert.type }} mt-6">
-      <span class="alert-icon">⚠️</span>
-      <span>{{ alert.message }}</span>
-      <a href="{% url 'settings' %}" class="alert-link">Ajustar umbral</a>
-    </div>
+  {% if alerts %}
+  {% for alert in alerts %}
+  <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
+    <span class="me-2">⚠️</span>
+    <span>{{ alert.message }}</span>
+    <a href="{% url 'settings' %}" class="alert-link ms-auto">Ajustar umbral</a>
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  {% if apis_status %}
+  <div class="d-flex justify-content-end gap-2 mb-4 flex-wrap">
+    {% for api in apis_status %}
+    <span class="badge bg-{% if api.is_healthy %}success{% else %}danger{% endif %}">
+      {{ api.name }}: {{ api.status }}
+    </span>
     {% endfor %}
-    {% endif %}
+  </div>
+  {% endif %}
 
-    {% if apis_status %}
-    <div class="apis-status mt-6">
-      {% for api in apis_status %}
-      <span class="api-badge {% if api.is_healthy %}api-ok{% else %}api-error{% endif %}">
-        {{ api.name }}: {{ api.status }}
-      </span>
-      {% endfor %}
-    </div>
-    {% endif %}
-
-    {% comment %} {% if instrument_distribution %}
-    <div class="c-card mt-6">
-      <h2 class="text-lg font-semibold mb-4">Distribución por instrumento</h2>
-      <div class="distribution-list">
-        {% for item in instrument_distribution %}
-        <div class="distribution-item">
-          <div class="distribution-label">
-            <span>{{ item.instrument_type|title }}</span>
-            <span class="font-mono">{{ item.total|money }}</span>
-          </div>
-          <div class="distribution-bar">
-            <div class="distribution-fill" style="width: 0%"></div>
+  {% if purchasing_power and purchasing_power.total_income > 0 %}
+  <div class="card mb-4 border-warning bg-warning bg-opacity-10">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 mb-0">Tu poder adquisitivo real</h2>
+        <span class="badge bg-warning text-dark">{{ purchasing_power.start_date|date:"d/m" }} → hoy</span>
+      </div>
+      <div class="row row-cols-3 g-3">
+        <div class="text-center">
+          <div class="p-3 bg-danger bg-opacity-10 rounded">
+            <small class="text-secondary d-block">En pesos</small>
+            <span class="h5 text-danger">-{{ purchasing_power.inflation_loss_pct|floatformat:1 }}%</span>
           </div>
         </div>
-        {% endfor %}
-      </div>
-    </div>
-    {% endif %} {% endcomment %}
-
-    {% if purchasing_power and purchasing_power.total_income > 0 %}
-    <div class="c-card mt-6 purchasing-power-card" style="padding: var(--space-6);">
-      <div class="purchasing-power-header">
-        <h2 class="text-lg font-semibold">Tu poder adquisitivo real</h2>
-        <span class="period-badge">{{ purchasing_power.start_date|date:"d/m" }} → hoy</span>
-      </div>
-      <div class="purchasing-power-content">
-        <div class="power-metric power-loss">
-          <span class="power-metric-label">En pesos</span>
-          <span class="power-metric-value text-loss">{{ purchasing_power.inflation_loss_pct|floatformat:1 }}%</span>
+        <div class="text-center">
+          <div class="p-3 bg-success bg-opacity-10 rounded">
+            <small class="text-secondary d-block">Si dolarizaras</small>
+            <span class="h5 text-success">+{{ purchasing_power.dollar_gain_pct|floatformat:1 }}%</span>
+          </div>
         </div>
-        <div class="power-metric power-gain">
-          <span class="power-metric-label">Si dolarizaras</span>
-          <span class="power-metric-value text-gain">{{ purchasing_power.dollar_gain_pct|floatformat:1 }}%</span>
-        </div>
-        <div class="power-metric power-gain">
-          <span class="power-metric-label">Si PF UVA</span>
-          <span class="power-metric-value text-gain">{{ purchasing_power.uva_gain_pct|floatformat:1 }}%</span>
+        <div class="text-center">
+          <div class="p-3 bg-success bg-opacity-10 rounded">
+            <small class="text-secondary d-block">Si PF UVA</small>
+            <span class="h5 text-success">+{{ purchasing_power.uva_gain_pct|floatformat:1 }}%</span>
+          </div>
         </div>
       </div>
     </div>
-    {% endif %}
+  </div>
+  {% endif %}
 
-    {% if opportunity and opportunity.balance_in_pesos > 0 %}
-    <div class="c-card mt-6" style="padding: var(--space-6);">
-      <h2 class="text-lg font-semibold mb-4">Costo de Oportunidad</h2>
-      <p class="text-sm text-secondary-text mb-4">Si hubieras invertido tu balance en pesos ({{ opportunity.balance_in_pesos|money }}) en lugar de mantenerlo:</p>
-      <div class="opportunity-grid">
-        <div class="opportunity-item">
-          <span class="text-sm text-secondary-text">Dólar Blue</span>
-          <span class="font-mono {% if opportunity.potential_gain_dollar > 0 %}text-gain{% else %}text-loss{% endif %}">
+  {% if opportunity and opportunity.balance_in_pesos > 0 %}
+  <div class="card mb-4">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Costo de Oportunidad</h2>
+      <p class="text-secondary small mb-3">Si hubieras invertido tu balance en pesos ({{ opportunity.balance_in_pesos|money }}) en lugar de mantenerlo:</p>
+      <div class="row row-cols-3 g-3">
+        <div class="text-center">
+          <small class="text-secondary d-block">Dólar Blue</small>
+          <span class="font-mono {% if opportunity.potential_gain_dollar > 0 %}text-success{% else %}text-danger{% endif %}">
             {% if opportunity.potential_gain_dollar > 0 %}+{% endif %}{{ opportunity.potential_gain_dollar|money }}
           </span>
         </div>
-        <div class="opportunity-item">
-          <span class="text-sm text-secondary-text">Bitcoin</span>
-          <span class="font-mono {% if opportunity.potential_gain_bitcoin > 0 %}text-gain{% else %}text-loss{% endif %}">
+        <div class="text-center">
+          <small class="text-secondary d-block">Bitcoin</small>
+          <span class="font-mono {% if opportunity.potential_gain_bitcoin > 0 %}text-success{% else %}text-danger{% endif %}">
             {% if opportunity.potential_gain_bitcoin > 0 %}+{% endif %}{{ opportunity.potential_gain_bitcoin|money }}
           </span>
         </div>
-        <div class="opportunity-item">
-          <span class="text-sm text-secondary-text">Plazo Fijo UVA</span>
-          <span class="font-mono {% if opportunity.potential_gain_uva > 0 %}text-gain{% else %}text-loss{% endif %}">
+        <div class="text-center">
+          <small class="text-secondary d-block">Plazo Fijo UVA</small>
+          <span class="font-mono {% if opportunity.potential_gain_uva > 0 %}text-success{% else %}text-danger{% endif %}">
             {% if opportunity.potential_gain_uva > 0 %}+{% endif %}{{ opportunity.potential_gain_uva|money }}
           </span>
         </div>
       </div>
     </div>
-    {% endif %}
-    
-    {% if recent_transactions %}
-    <div class="c-card mt-6" style="padding: var(--space-6);">
-      <h2 class="text-lg font-semibold mb-4">Transacciones recientes</h2>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Tipo</th>
-            <th>Categoría</th>
-            <th>Instrumento</th>
-            <th>Monto</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for tx in recent_transactions %}
-          <tr>
-            <td>{{ tx.date|date:"d/m" }}</td>
-            <td>
-              <span class="c-badge badge-{{ tx.transaction_type }}">
-                {% if tx.transaction_type == 'income' %}Ingreso{% else %}Gasto{% endif %}
-              </span>
-            </td>
-            <td>{{ tx.get_category_display }}</td>
-            <td>{{ tx.get_instrument_type_display }}</td>
-            <td class="font-mono {% if tx.transaction_type == 'income' %}text-gain{% else %}text-loss{% endif %}">
-              {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}{{ tx.amount|money }}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      <div class="mt-4 text-center">
-        <a href="{% url 'transactions:list' %}" class="c-btn c-btn--ghost">Ver todas las transacciones</a>
+  </div>
+  {% endif %}
+  
+  {% if recent_transactions %}
+  <div class="card mb-4">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Transacciones recientes</h2>
+      <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Categoría</th>
+              <th>Instrumento</th>
+              <th>Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for tx in recent_transactions %}
+            <tr>
+              <td>{{ tx.date|date:"d/m" }}</td>
+              <td>
+                <span class="badge bg-{% if tx.transaction_type == 'income' %}success{% else %}danger{% endif %}">
+                  {% if tx.transaction_type == 'income' %}Ingreso{% else %}Gasto{% endif %}
+                </span>
+              </td>
+              <td>{{ tx.get_category_display }}</td>
+              <td>{{ tx.get_instrument_type_display }}</td>
+              <td class="font-mono {% if tx.transaction_type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}{{ tx.amount|money }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="text-center mt-3">
+        <a href="{% url 'transactions:list' %}" class="btn btn-outline-light btn-sm">Ver todas las transacciones</a>
       </div>
     </div>
-    {% else %}
-    <div class="c-card mt-6 empty-state">
-      <div class="empty-state-icon">📊</div>
-      <h3 class="empty-state-title">No hay transacciones este mes</h3>
-      <p class="text-secondary-text">Empezá a registrar tus ingresos y gastos para ver tu dashboard.</p>
-      <a href="{% url 'transactions:create' %}" class="c-btn c-btn--primary mt-4">Agregar primera transacción</a>
-    </div>
-    {% endif %}
   </div>
+  {% else %}
+  <div class="card text-center">
+    <div class="card-body py-5">
+      <h3 class="h4 mb-2">No hay transacciones este mes</h3>
+      <p class="text-secondary mb-3">Empezá a registrar tus ingresos y gastos para ver tu dashboard.</p>
+      <a href="{% url 'transactions:create' %}" class="btn btn-primary">Agregar primera transacción</a>
+    </div>
+  </div>
+  {% endif %}
 </main>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const toggle = document.getElementById('currency-toggle');
+  const currencyBtns = document.querySelectorAll('.currency-btn');
   const arsValues = document.querySelectorAll('.ars-value');
   const usdValues = document.querySelectorAll('.usd-value');
   
   function setCurrency(currency) {
     if (currency === 'usd') {
-      arsValues.forEach(el => el.style.display = 'none');
-      usdValues.forEach(el => el.style.display = 'inline');
-      toggle.querySelector('[data-currency="ars"]').classList.remove('c-toggle-option--active');
-      toggle.querySelector('[data-currency="usd"]').classList.add('c-toggle-option--active');
+      arsValues.forEach(el => el.classList.add('d-none'));
+      usdValues.forEach(el => el.classList.remove('d-none'));
+      currencyBtns.forEach(btn => {
+        if (btn.dataset.currency === 'usd') {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
     } else {
-      arsValues.forEach(el => el.style.display = 'inline');
-      usdValues.forEach(el => el.style.display = 'none');
-      toggle.querySelector('[data-currency="ars"]').classList.add('c-toggle-option--active');
-      toggle.querySelector('[data-currency="usd"]').classList.remove('c-toggle-option--active');
+      arsValues.forEach(el => el.classList.remove('d-none'));
+      usdValues.forEach(el => el.classList.add('d-none'));
+      currencyBtns.forEach(btn => {
+        if (btn.dataset.currency === 'ars') {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
     }
   }
   
-  toggle.querySelectorAll('.c-toggle-option').forEach(option => {
-    option.addEventListener('click', function() {
+  currencyBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
       setCurrency(this.dataset.currency);
     });
   });

@@ -3,113 +3,119 @@
 
 {% block title %}Transacciones - ArsForte{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static "css/styles.css" %}">
-{% endblock %}
-
 {% block navbar_actions %}
-  <a href="{% url 'dashboard' %}" class="c-btn c-btn--ghost">Dashboard</a>
-  <a href="{% url 'logout' %}" class="c-btn c-btn--ghost">Cerrar sesión</a>
+  <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-sm">Dashboard</a>
+  <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Cerrar sesión</a>
 {% endblock %}
 
 {% block content %}
-<main class="container">
-  <div class="c-page-header">
-    <h1 class="text-2xl font-bold">Transacciones</h1>
-    <a href="{% url 'transactions:create' %}" class="c-btn c-btn--primary">Nueva Transacción</a>
+<main class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 fw-bold">Transacciones</h1>
+    <a href="{% url 'transactions:create' %}" class="btn btn-primary">Nueva Transacción</a>
   </div>
 
-  <div class="c-card c-filters">
-    <form method="get" class="c-filters-form">
-      <div class="c-filter-group">
-        <label>Categoría</label>
-        <select name="category" class="c-form-input">
-          <option value="">Todas</option>
-          {% for value, label in categories %}
-          <option value="{{ value }}" {% if filter_category == value %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="c-filter-group">
-        <label>Instrumento</label>
-        <select name="instrument" class="c-form-input">
-          <option value="">Todos</option>
-          {% for value, label in instruments %}
-          <option value="{{ value }}" {% if filter_instrument == value %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="c-filter-group c-filter-group--search">
-        <label>Buscar</label>
-        <input type="text" name="search" class="c-form-input" placeholder="Buscar..." value="{{ search|default:'' }}">
-      </div>
-      <button type="submit" class="c-btn c-btn--secondary">Filtrar</button>
-    </form>
+  <div class="card mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">Categoría</label>
+          <select name="category" class="form-select">
+            <option value="">Todas</option>
+            {% for value, label in categories %}
+            <option value="{{ value }}" {% if filter_category == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Instrumento</label>
+          <select name="instrument" class="form-select">
+            <option value="">Todos</option>
+            {% for value, label in instruments %}
+            <option value="{{ value }}" {% if filter_instrument == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Buscar</label>
+          <input type="text" name="search" class="form-control" placeholder="Buscar..." value="{{ search|default:'' }}">
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-outline-secondary w-100">Filtrar</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   {% if transactions %}
-  <div class="c-card">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Tipo</th>
-          <th>Categoría</th>
-          <th>Instrumento</th>
-          <th>Monto</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for tx in transactions %}
-        <tr>
-          <td>{{ tx.date|date:"d/m/Y" }}</td>
-          <td>
-            <span class="c-badge badge-{{ tx.transaction_type }}">
-              {% if tx.transaction_type == 'income' %}Ingreso{% else %}Gasto{% endif %}
-            </span>
-          </td>
-          <td>{{ tx.get_category_display }}</td>
-          <td>{{ tx.get_instrument_type_display }}</td>
-            <td class="font-mono {% if tx.transaction_type == 'income' %}text-gain{% else %}text-loss{% endif %}">
-            {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}{{ tx.amount|money }}
-          </td>
-          <td class="c-actions-cell">
-            <button type="button" class="c-btn c-btn--ghost c-btn--sm" onclick="openDetailModal({{ tx.pk }})">Detalle</button>
-            <a href="{% url 'transactions:update' tx.pk %}" class="c-btn c-btn--ghost c-btn--sm">Editar</a>
-            <form method="post" action="{% url 'transactions:delete' tx.pk %}" class="c-inline-form">
-              {% csrf_token %}
-              <button type="submit" class="c-btn c-btn--danger c-btn--sm" onclick="return confirm('¿Estás seguro de eliminar esta transacción?')">Eliminar</button>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-dark table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Categoría</th>
+            <th>Instrumento</th>
+            <th>Monto</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tx in transactions %}
+          <tr>
+            <td>{{ tx.date|date:"d/m/Y" }}</td>
+            <td>
+              <span class="badge bg-{% if tx.transaction_type == 'income' %}success{% else %}danger{% endif %}">
+                {% if tx.transaction_type == 'income' %}Ingreso{% else %}Gasto{% endif %}
+              </span>
+            </td>
+            <td>{{ tx.get_category_display }}</td>
+            <td>{{ tx.get_instrument_type_display }}</td>
+            <td class="font-mono {% if tx.transaction_type == 'income' %}text-success{% else %}text-danger{% endif %}">
+              {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}{{ tx.amount|money }}
+            </td>
+            <td>
+              <div class="d-flex gap-1">
+                <button type="button" class="btn btn-outline-light btn-sm" onclick="openDetailModal({{ tx.pk }})">Detalle</button>
+                <a href="{% url 'transactions:update' tx.pk %}" class="btn btn-outline-light btn-sm">Editar</a>
+                <form method="post" action="{% url 'transactions:delete' tx.pk %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta transacción?')">Eliminar</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
   {% else %}
-  <div class="c-card empty-state">
-    <div class="empty-state-icon">💸</div>
-    <h3 class="empty-state-title">No hay transacciones</h3>
-    <p class="text-secondary-text">
-      {% if filter_category or filter_instrument or search %}
-        No se encontraron transacciones con los filtros aplicados.
+  <div class="card text-center">
+    <div class="card-body py-5">
+      <h3 class="h4 mb-2">No hay transacciones</h3>
+      <p class="text-secondary mb-3">
+        {% if filter_category or filter_instrument or search %}
+          No se encontraron transacciones con los filtros aplicados.
+        {% else %}
+          Registrá tu primera transacción para empezar a trackear tus finanzas.
+        {% endif %}
+      </p>
+      {% if not filter_category and not filter_instrument and not search %}
+      <a href="{% url 'transactions:create' %}" class="btn btn-primary">Agregar primera transacción</a>
       {% else %}
-        Registrá tu primera transacción para empezar a trackear tus finanzas.
+      <a href="{% url 'transactions:list' %}" class="btn btn-outline-secondary">Limpiar filtros</a>
       {% endif %}
-    </p>
-    {% if not filter_category and not filter_instrument and not search %}
-    <a href="{% url 'transactions:create' %}" class="c-btn c-btn--primary mt-4">Agregar primera transacción</a>
-    {% else %}
-    <a href="{% url 'transactions:list' %}" class="c-btn c-btn--secondary mt-4">Limpiar filtros</a>
-    {% endif %}
+    </div>
   </div>
   {% endif %}
 </main>
 
 {% include 'transactions/modal_detail.html' %}
+
 {% block extra_js %}
-<script src="{% static "js/modalDetail.js" %}"></script>
+<script src="{% static 'js/modalDetail.js' %}"></script>
 {% endblock %}
 
 {% endblock %}

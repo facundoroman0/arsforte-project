@@ -4,69 +4,75 @@
 {% block title %}Configuración - ArsForte{% endblock %}
 
 {% block navbar_actions %}
-  <a href="{% url 'dashboard' %}" class="c-btn c-btn--ghost">Dashboard</a>
-  <a href="{% url 'logout' %}" class="c-btn c-btn--ghost">Cerrar sesión</a>
+  <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-sm">Dashboard</a>
+  <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Cerrar sesión</a>
 {% endblock %}
 
 {% block content %}
-<main class="container c-settings-container">
-  <h1 class="text-2xl font-bold mb-6">Configuración</h1>
+<main class="container py-4" style="max-width: 600px;">
+  <h1 class="h3 fw-bold mb-4">Configuración</h1>
 
-  <div class="c-card" style="padding: var(--space-6);">
-    <h2 class="text-lg font-semibold mb-4">Notificaciones</h2>
-    <form method="post" class="c-settings-form">
-      {% csrf_token %}
-      
-      <div class="c-form-group">
-        <label for="id_threshold">Alerta de riesgo en pesos</label>
-        <p class="text-sm text-secondary-text mb-3">
-          Notificarme cuando el porcentaje en pesos supere:
-        </p>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Notificaciones</h2>
+      <form method="post">
+        {% csrf_token %}
         
-        <div class="c-slider-container">
-          <input 
-            type="range" 
-            name="notification_threshold" 
-            id="id_threshold" 
-            min="10" 
-            max="90" 
-            value="{{ user.notification_threshold }}"
-            class="c-slider"
-          >
-          <div class="c-slider-labels">
-            <span>10%</span>
-            <span class="c-slider-value">{{ user.notification_threshold|floatformat:0 }}%</span>
-            <span>90%</span>
+        <div class="mb-3">
+          <label for="id_threshold" class="form-label">Alerta de riesgo en pesos</label>
+          <p class="text-secondary small mb-2">
+            Notificarme cuando el porcentaje en pesos supere:
+          </p>
+          
+          <div class="mb-2">
+            <input 
+              type="range" 
+              name="notification_threshold" 
+              id="id_threshold" 
+              min="10" 
+              max="90" 
+              value="{{ user.notification_threshold }}"
+              class="form-range"
+            >
           </div>
+          <div class="d-flex justify-content-between">
+            <span class="small text-secondary">10%</span>
+            <span class="badge bg-warning text-dark">{{ user.notification_threshold|floatformat:0 }}%</span>
+            <span class="small text-secondary">90%</span>
+          </div>
+          
+          <p class="text-secondary small mt-2 mb-0">
+            Preview: "Tenés más del {{ user.notification_threshold|floatformat:0 }}% en pesos"
+          </p>
         </div>
-        
-        <p class="text-sm text-secondary-text mt-2">
-          Preview: "Tenés más del {{ user.notification_threshold|floatformat:0 }}% en pesos"
-        </p>
+
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Datos de cuenta</h2>
+      <div class="d-flex justify-content-between py-2 border-bottom">
+        <span class="text-secondary">Email:</span>
+        <span>{{ user.email }}</span>
       </div>
-
-      <button type="submit" class="c-btn c-btn--primary mt-4">Guardar cambios</button>
-    </form>
-  </div>
-
-  <div class="c-card mt-6" style="padding: var(--space-6);">
-    <h2 class="text-lg font-semibold mb-4">Datos de cuenta</h2>
-    <div class="c-info-row">
-      <span class="text-secondary-text">Email:</span>
-      <span>{{ user.email }}</span>
-    </div>
-    <div class="c-info-row">
-      <span class="text-secondary-text">Miembro desde:</span>
-      <span>{{ user.date_joined|date:"d F Y" }}</span>
+      <div class="d-flex justify-content-between py-2">
+        <span class="text-secondary">Miembro desde:</span>
+        <span>{{ user.date_joined|date:"d F Y" }}</span>
+      </div>
     </div>
   </div>
 
-  <div class="c-card mt-6 c-danger-zone" style="padding: var(--space-6);">
-    <h2 class="text-lg font-semibold mb-4 text-secondary">Zona de peligro</h2>
-    <p class="text-sm text-secondary-text mb-4">
-      Esta acción es irreversible. Se eliminarán todos tus datos.
-    </p>
-    <button class="c-btn c-btn--danger">Eliminar mi cuenta</button>
+  <div class="card border-danger mb-4">
+    <div class="card-body">
+      <h2 class="h5 mb-2 text-danger">Zona de peligro</h2>
+      <p class="text-secondary small mb-3">
+        Esta acción es irreversible. Se eliminarán todos tus datos.
+      </p>
+      <button class="btn btn-danger">Eliminar mi cuenta</button>
+    </div>
   </div>
 </main>
 {% endblock %}
