@@ -1,0 +1,102 @@
+{% load format %}
+<div class="glass mb-3" style="padding: 1rem; border-radius: 12px;">
+  <h5 class="mb-1">
+    {% if transaction.type == 'income' %}+{% else %}-{% endif %}{{ transaction.amount|money }}
+    <span class="text-muted" style="font-size: 0.875rem;">en {{ transaction.instrument }}</span>
+  </h5>
+  <small class="text-muted">
+    {{ transaction.date }} · {% if transaction.type == 'income' %}Ingreso{% else %}Gasto{% endif %} · {{ transaction.category }}
+    {% if transaction.description %} · {{ transaction.description }}{% endif %}
+  </small>
+</div>
+
+{% if transaction.instrument == 'Pesos' %}
+  {% if analysis.days_passed > 0 %}
+  <div class="glass mb-3" style="padding: 1rem; border-radius: 12px; border-left: 3px solid #e74c3c;">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span class="fw-medium">💸 Valor hoy en pesos</span>
+      <span class="text-negative">-{{ analysis.inflation_loss_pct|floatformat:1 }}%</span>
+    </div>
+    <div class="d-flex justify-content-between">
+      <div>
+        <small class="text-muted d-block">Poder adquisitivo</small>
+        <span class="font-mono">{{ analysis.value_in_pesos_today|money }}</span>
+      </div>
+      <div class="text-end">
+        <small class="text-muted d-block">Pérdida ({{ analysis.days_passed }} días)</small>
+        <span class="font-mono text-negative">-{{ analysis.inflation_loss|money }}</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if alternatives.dollar_blue %}
+  <div class="glass mb-3" style="padding: 1rem; border-radius: 12px; border-left: 3px solid {% if alternatives.dollar_blue.gain_loss|default:'0'|add:0 >= 0 %}#10b981{% else %}#e74c3c{% endif %};">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span class="fw-medium">💵 Dólar Blue</span>
+    </div>
+    <div class="d-flex justify-content-between">
+      <div>
+        <small class="text-muted d-block">Valor hoy</small>
+        <span class="font-mono">{{ alternatives.dollar_blue.current_value|money }}</span>
+      </div>
+      <div class="text-end">
+        <small class="text-muted d-block">Ganancia/Pérdida</small>
+        <span class="font-mono {% if alternatives.dollar_blue.gain_loss|default:'0'|add:0 >= 0 %}text-positive{% else %}text-negative{% endif %}">
+          {% if alternatives.dollar_blue.gain_loss|default:'0'|add:0 >= 0 %}+{% endif %}{{ alternatives.dollar_blue.gain_loss|money }} ({{ alternatives.dollar_blue.percentage|floatformat:1 }}%)
+        </span>
+      </div>
+    </div>
+    <small class="text-muted d-block mt-2">{{ alternatives.dollar_blue.details }}</small>
+  </div>
+  {% endif %}
+
+  {% if alternatives.bitcoin %}
+  <div class="glass mb-3" style="padding: 1rem; border-radius: 12px; border-left: 3px solid {% if alternatives.bitcoin.gain_loss|default:'0'|add:0 >= 0 %}#10b981{% else %}#e74c3c{% endif %};">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span class="fw-medium">📈 Bitcoin</span>
+    </div>
+    <div class="d-flex justify-content-between">
+      <div>
+        <small class="text-muted d-block">Valor hoy</small>
+        <span class="font-mono">{{ alternatives.bitcoin.current_value|money }}</span>
+      </div>
+      <div class="text-end">
+        <small class="text-muted d-block">Ganancia/Pérdida</small>
+        <span class="font-mono {% if alternatives.bitcoin.gain_loss|default:'0'|add:0 >= 0 %}text-positive{% else %}text-negative{% endif %}">
+          {% if alternatives.bitcoin.gain_loss|default:'0'|add:0 >= 0 %}+{% endif %}{{ alternatives.bitcoin.gain_loss|money }} ({{ alternatives.bitcoin.percentage|floatformat:1 }}%)
+        </span>
+      </div>
+    </div>
+    <small class="text-muted d-block mt-2">{{ alternatives.bitcoin.details }}</small>
+  </div>
+  {% endif %}
+
+  {% if alternatives.plazo_fijo %}
+  <div class="glass mb-3" style="padding: 1rem; border-radius: 12px; border-left: 3px solid {% if alternatives.plazo_fijo.gain_loss|default:'0'|add:0 >= 0 %}#10b981{% else %}#e74c3c{% endif %};">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span class="fw-medium">🏦 Plazo Fijo UVA</span>
+    </div>
+    <div class="d-flex justify-content-between">
+      <div>
+        <small class="text-muted d-block">Valor hoy</small>
+        <span class="font-mono">{{ alternatives.plazo_fijo.current_value|money }}</span>
+      </div>
+      <div class="text-end">
+        <small class="text-muted d-block">Ganancia/Pérdida</small>
+        <span class="font-mono {% if alternatives.plazo_fijo.gain_loss|default:'0'|add:0 >= 0 %}text-positive{% else %}text-negative{% endif %}">
+          {% if alternatives.plazo_fijo.gain_loss|default:'0'|add:0 >= 0 %}+{% endif %}{{ alternatives.plazo_fijo.gain_loss|money }} ({{ alternatives.plazo_fijo.percentage|floatformat:1 }}%)
+        </span>
+      </div>
+    </div>
+    <small class="text-muted d-block mt-2">{{ alternatives.plazo_fijo.details }}</small>
+  </div>
+  {% endif %}
+{% else %}
+<div class="glass" style="padding: 1rem; border-radius: 12px;">
+  <p class="text-muted text-center mb-0">
+    Esta transacción ya está en una alternativa ({{ transaction.instrument }}).<br>
+    El costo de oportunidad se calculó en relación a mantener el valor en pesos.
+  </p>
+</div>
+{% endif %}

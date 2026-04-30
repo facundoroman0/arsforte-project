@@ -144,7 +144,7 @@ class TransactionDeleteView(LoginRequiredMixin, View):
 class TransactionDetailView(LoginRequiredMixin, View):
     """
     Vista para obtener el análisis de costo de oportunidad de una transacción.
-    Retorna JSON para ser usado en un modal.
+    Retorna HTML renderizado para ser usado en un modal.
     """
     login_url = 'login'
 
@@ -162,20 +162,20 @@ class TransactionDetailView(LoginRequiredMixin, View):
             exchange_rate_uva=transaction.exchange_rate_uva
         )
         
-        data = {
+        context = {
             'transaction': {
                 'id': str(transaction.pk),
-                'amount': str(transaction.amount),
-                'date': transaction.date.isoformat(),
+                'amount': transaction.amount,
+                'date': transaction.date.strftime('%d/%m/%Y'),
                 'type': transaction.transaction_type,
                 'category': transaction.get_category_display(),
                 'instrument': transaction.get_instrument_type_display(),
                 'description': transaction.description,
             },
             'analysis': {
-                'original_amount': str(analysis.original_amount),
-                'value_in_pesos_today': str(analysis.value_in_pesos_today),
-                'inflation_loss': str(analysis.inflation_loss),
+                'original_amount': analysis.original_amount,
+                'value_in_pesos_today': analysis.value_in_pesos_today,
+                'inflation_loss': analysis.inflation_loss,
                 'inflation_loss_pct': analysis.inflation_loss_pct,
                 'days_passed': (date.today() - transaction.date).days,
             },
@@ -186,16 +186,16 @@ class TransactionDetailView(LoginRequiredMixin, View):
             } if analysis.dollar_blue_value else None,
         }
         
-        return JsonResponse(data)
+        return render(request, 'transactions/detail_content.html', context)
     
     def _format_opportunity(self, opportunity):
         if opportunity is None:
             return None
         return {
             'instrument': opportunity.instrument,
-            'original_amount': str(opportunity.original_amount),
-            'current_value': str(opportunity.current_value),
-            'gain_loss': str(opportunity.gain_loss),
+            'original_amount': opportunity.original_amount,
+            'current_value': opportunity.current_value,
+            'gain_loss': opportunity.gain_loss,
             'percentage': opportunity.percentage,
             'details': opportunity.details,
         }
