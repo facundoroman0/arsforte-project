@@ -94,11 +94,36 @@ body {
   border: 1px solid var(--glass-border);
 }
 
-.badge.glass {
-  background: rgba(15, 15, 26, 0.8);
+/* Badge glass - Base */
+.badge-glass {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-border);
+  border: 2px solid;
+  border-radius: 5px;
+  font-weight: 500;
+  font-size: 0.75rem;
+  padding: 0.35em 0.65em;
+}
+
+/* Badge glass - Success (verde) */
+.badge-glass-success {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #10b981;
+}
+
+/* Badge glass - Danger (rojo) */
+.badge-glass-danger {
+  background: rgba(231, 76, 60, 0.25);
+  border-color: rgba(231, 76, 60, 0.4);
+  color: #e74c3c;
+}
+
+/* Badge glass - Warning (naranja) */
+.badge-glass-warning {
+  background: rgba(255, 166, 43, 0.25);
+  border-color: rgba(255, 166, 43, 0.4);
+  color: #FFA62B;
 }
 
 /* Accent colors */

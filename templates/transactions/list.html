@@ -66,7 +66,7 @@
           <tr>
             <td>{{ tx.date|date:"d/m/Y" }}</td>
             <td>
-              <span class="badge glass bg-{% if tx.transaction_type == 'income' %}success{% else %}danger{% endif %}">
+              <span class="badge-glass {% if tx.transaction_type == 'income' %}badge-glass-success{% else %}badge-glass-danger{% endif %}">
                 {% if tx.transaction_type == 'income' %}Ingreso{% else %}Gasto{% endif %}
               </span>
             </td>

@@ -85,7 +85,7 @@
   {% if apis_status %}
   <div class="d-flex justify-content-end gap-2 mb-4 flex-wrap">
     {% for api in apis_status %}
-    <span class="badge glass bg-{% if api.is_healthy %}success{% else %}danger{% endif %}">
+    <span class="badge-glass {% if api.is_healthy %}badge-glass-success{% else %}badge-glass-danger{% endif %}">
       {{ api.name }}: {{ api.status }}
     </span>
     {% endfor %}
@@ -97,7 +97,7 @@
     <div class="card-body">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="h5 mb-0">Tu poder adquisitivo real</h2>
-        <span class="badge glass bg-warning text-dark">{{ purchasing_power.start_date|date:"d/m" }} → hoy</span>
+        <span class="badge-glass badge-glass-warning">{{ purchasing_power.start_date|date:"d/m" }} → hoy</span>
       </div>
       <div class="row row-cols-3 g-3">
         <div class="text-center">
@@ -172,7 +172,7 @@
             <tr>
               <td>{{ tx.date|date:"d/m" }}</td>
               <td>
-                <span class="badge glass bg-{% if tx.transaction_type == 'income' %}success{% else %}danger{% endif %}">
+                <span class="badge-glass {% if tx.transaction_type == 'income' %}badge-glass-success{% else %}badge-glass-danger{% endif %}">
                   {% if tx.transaction_type == 'income' %}Ingreso{% else %}Gasto{% endif %}
                 </span>
               </td>
