@@ -131,7 +131,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': config('REDIS_URL', default='redis://localhost:6379/0'),
-        'KEY_PREFIX': 'arsforte',
+        'KEY_PREFIX': config('CACHE_KEY_PREFIX', default='arsforte'),
     }
 }
 
@@ -190,6 +190,6 @@ LOGGING = {
 
 
 # Rate Limiting Settings (django-ratelimit)
-RATELIMIT_USE_CACHE = 'default'
-RATELIMIT_CACHE_PREFIX = 'rl:'
-RATELIMIT_ENABLE = not DEBUG  # Enable in production, disable in development
+RATELIMIT_USE_CACHE = config('RATELIMIT_USE_CACHE', default='default')
+RATELIMIT_CACHE_PREFIX = config('RATELIMIT_CACHE_PREFIX', default='rl:')
+RATELIMIT_ENABLE = config('RATELIMIT_ENABLE', default=True, cast=bool)
