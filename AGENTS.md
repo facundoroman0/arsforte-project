@@ -6,7 +6,26 @@
 ```bash
 cd ~/arsforte-project
 source venv/bin/activate
+
+# Start Redis (required for cache and rate limiting)
+redis-server --daemonize yes
+
 python manage.py runserver
+```
+
+### Redis Commands
+```bash
+# Start Redis
+redis-server
+
+# Check Redis is running
+redis-cli ping  # Returns: PONG
+
+# Clear all keys (cache/rate limit data)
+redis-cli FLUSHALL
+
+# View rate limit keys
+redis-cli KEYS "rl:*"
 ```
 
 ### Running Tests
@@ -39,6 +58,49 @@ python manage.py showmigrations
 ### Django Shell
 ```bash
 python manage.py shell
+```
+
+---
+
+## Security Features
+
+### Security Headers (enabled by default)
+- `SECURE_SSL_REDIRECT` - Redirect HTTP to HTTPS
+- `SECURE_HSTS_SECONDS` - HSTS for 1 year
+- `SECURE_CONTENT_TYPE_NOSNIFF` - Prevent MIME sniffing
+- `SECURE_BROWSER_XSS_FILTER` - XSS protection
+- `SECURE_REFERRER_POLICY` - Referrer policy
+
+### Secure Cookies
+- `SESSION_COOKIE_SECURE` - Secure cookies in production
+- `SESSION_COOKIE_HTTPONLY` - Prevent JS access
+- `SESSION_COOKIE_SAMESITE` - CSRF protection
+- `SESSION_COOKIE_AGE` - 1 hour timeout
+
+### Security Logging
+- Logs to `security.log` file
+- Records: user actions, IP addresses, request paths
+- Location: `security/` module with `log_access` decorator
+
+### Rate Limiting (django-ratelimit)
+Rate limits applied to sensitive endpoints:
+
+| Endpoint | Limit | Behavior |
+|----------|-------|----------|
+| POST /users/login/ | 5/min | Warning message |
+| POST /users/register/ | 3/hour | HTTP 403 |
+| POST /transactions/create/ | 20/min | HTTP 403 |
+| POST /transactions/update/ | 20/min | HTTP 403 |
+| POST /transactions/delete/ | 20/min | HTTP 403 |
+
+Usage in views:
+```python
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
+
+@method_decorator(ratelimit(key='ip', rate='5/m', method='POST', block=False), name='post')
+class LoginView(View):
+    ...
 ```
 
 ---
@@ -189,11 +251,15 @@ arsforte-project/
 │   ├── inflation.py      # Inflation data
 │   ├── cache.py          # Caching layer
 │   └── opportunity_cost.py  # Cost calculations
+├── security/             # Security module
+│   ├── __init__.py
+│   └── decorators.py     # @log_access decorator
 ├── templates/            # HTML templates
 ├── static/               # CSS, JS, images
 │   └── css/
 │       └── global-styles.css
-└── docs/                 # Documentation
+├── docs/                 # Documentation
+└── requirements.txt      # Dependencies
 ```
 
 ---
@@ -204,4 +270,13 @@ Create `.env` file with:
 SECRET_KEY=your-secret-key
 DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Redis Cache (optional - has defaults)
+REDIS_URL=redis://localhost:6379/0
+CACHE_KEY_PREFIX=arsforte
+
+# Rate Limiting (optional - has defaults)
+RATELIMIT_ENABLE=True
+RATELIMIT_USE_CACHE=default
+RATELIMIT_CACHE_PREFIX=rl:
 ```
