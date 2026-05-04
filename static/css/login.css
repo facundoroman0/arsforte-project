@@ -1,0 +1,24 @@
+.card.glass{
+  max-width: 400px; 
+  width: 100%;
+}
+
+.card-body .logo-brand{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+}
+
+.card-body .logo-brand svg{
+  width: 56px;
+  height: 56px;
+}
+
+.card-body .logo-brand h1{
+  margin: 0;
+  font-size: 1.9rem;
+}
+
+
