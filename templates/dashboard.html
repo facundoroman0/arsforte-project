@@ -103,19 +103,19 @@
         <div class="text-center">
           <div class="p-3 rounded" style="background: rgba(231, 76, 60, 0.1);">
             <small class="text-secondary d-block">En pesos</small>
-            <span class="h5 text-negative">-{{ purchasing_power.inflation_loss_pct|floatformat:1 }}%</span>
+            <span class="h5 text-negative">{{ purchasing_power.inflation_loss_pct|floatformat:1 }}%</span>
           </div>
         </div>
         <div class="text-center">
           <div class="p-3 rounded" style="background: rgba(16, 185, 129, 0.1);">
             <small class="text-secondary d-block">Si dolarizaras</small>
-            <span class="h5 text-positive">+{{ purchasing_power.dollar_gain_pct|floatformat:1 }}%</span>
+            <span class="h5 text-positive">{{ purchasing_power.dollar_gain_pct|floatformat:1 }}%</span>
           </div>
         </div>
         <div class="text-center">
           <div class="p-3 rounded" style="background: rgba(16, 185, 129, 0.1);">
             <small class="text-secondary d-block">Si PF UVA</small>
-            <span class="h5 text-positive">+{{ purchasing_power.uva_gain_pct|floatformat:1 }}%</span>
+            <span class="h5 text-positive">{{ purchasing_power.uva_gain_pct|floatformat:1 }}%</span>
           </div>
         </div>
       </div>
