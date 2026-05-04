@@ -66,6 +66,12 @@ body {
   color: var(--color-cyan);
 }
 
+.navbar-brand svg{
+  object-fit: content;
+  width: 56px;
+  height: 56px;
+}
+
 /* Navbar items */
 .navbar .btn {
   background: transparent;
