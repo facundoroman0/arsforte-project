@@ -9,10 +9,11 @@ Proporciona datos históricos de:
 import logging
 import requests
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from typing import Optional
-from functools import lru_cache
+
+from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
@@ -28,13 +29,25 @@ class HistoricalRatesService:
     CACHE_TTL = 3600
     UVA_ID = 31
     UVA_RATE_ID = 1227
+    REQUEST_TIMEOUT = 10
 
-    _blue_evolution: Optional[list[dict]] = None
-    _blue_loaded: bool = False
-    _uva_history: Optional[list[dict]] = None
-    _uva_loaded: bool = False
-    _uva_rate_history: Optional[list[dict]] = None
-    _uva_rate_loaded: bool = False
+    HEADERS = {
+        'Accept': 'application/json',
+        'User-Agent': 'ArsForte/1.0 (https://github.com/arsforte)'
+    }
+
+    def _get_cache_key(self, prefix: str) -> str:
+        return f'historical_rates:{prefix}'
+
+    def _get_cached_data(self, prefix: str) -> Optional[list[dict]]:
+        return cache.get(self._get_cache_key(prefix))
+
+    def _set_cached_data(self, prefix: str, data: list[dict], ttl: int = None) -> None:
+        cache.set(
+            self._get_cache_key(prefix),
+            data,
+            ttl or self.CACHE_TTL
+        )
 
     def get_blue_rate(self, target_date: date) -> Optional[HistoricalRate]:
         evolution = self._get_blue_evolution()
@@ -51,20 +64,40 @@ class HistoricalRatesService:
         return None
 
     def _get_blue_evolution(self) -> Optional[list[dict]]:
-        if self._blue_loaded:
-            return self._blue_evolution
+        cached_data = self._get_cached_data('blue_evolution')
+        if cached_data is not None:
+            return cached_data
 
         try:
             response = requests.get(
                 'https://api.bluelytics.com.ar/v2/evolution.json',
-                timeout=15
+                timeout=self.REQUEST_TIMEOUT,
+                headers=self.HEADERS
             )
+
+            if response.status_code == 429:
+                logger.warning('Bluelytics rate limit exceeded')
+                return None
+
             if response.status_code == 200:
-                self._blue_evolution = response.json()
-                self._blue_loaded = True
-                return self._blue_evolution
+                data = response.json()
+                one_year_ago = date.today() - timedelta(days=365)
+                filtered_data = [
+                    entry for entry in data
+                    if entry.get('date', '') and date.fromisoformat(entry['date']) >= one_year_ago
+                ]
+                self._set_cached_data('blue_evolution', filtered_data)
+                return filtered_data
+
+            logger.warning(f'Bluelytics evolution API status: {response.status_code}')
+
+        except requests.Timeout:
+            logger.error('Bluelytics evolution API request timed out')
+        except requests.ConnectionError as e:
+            logger.error(f'Bluelytics evolution API connection error: {e}')
         except Exception as e:
             logger.error(f'Bluelytics evolution API error: {e}')
+
         return None
 
     def get_uva_rate(self, target_date: date) -> Optional[HistoricalRate]:
@@ -83,23 +116,38 @@ class HistoricalRatesService:
         return None
 
     def _get_uva_history(self) -> Optional[list[dict]]:
-        if self._uva_loaded:
-            return self._uva_history
+        cached_data = self._get_cached_data('uva_history')
+        if cached_data is not None:
+            return cached_data
 
         try:
+            one_year_ago = (date.today() - timedelta(days=365)).isoformat()
             response = requests.get(
                 f'https://api.bcra.gob.ar/estadisticas/v4.0/Monetarias/{self.UVA_ID}',
-                params={'desde': '2016-01-01'},
-                headers={'Accept': 'application/json'},
-                timeout=15
+                params={'desde': one_year_ago},
+                headers=self.HEADERS,
+                timeout=self.REQUEST_TIMEOUT
             )
+
+            if response.status_code == 429:
+                logger.warning('BCRA rate limit exceeded')
+                return None
+
             if response.status_code == 200:
                 data = response.json()
-                self._uva_history = data.get('results', [{}])[0].get('detalle', [])
-                self._uva_loaded = True
-                return self._uva_history
+                history = data.get('results', [{}])[0].get('detalle', [])
+                self._set_cached_data('uva_history', history)
+                return history
+
+            logger.warning(f'BCRA UVA API status: {response.status_code}')
+
+        except requests.Timeout:
+            logger.error('BCRA UVA API request timed out')
+        except requests.ConnectionError as e:
+            logger.error(f'BCRA UVA API connection error: {e}')
         except Exception as e:
             logger.error(f'BCRA UVA API error: {e}')
+
         return None
 
     def get_uva_rate_history(self, target_date: date) -> Optional[HistoricalRate]:
@@ -118,23 +166,38 @@ class HistoricalRatesService:
         return None
 
     def _get_uva_rate_history(self) -> Optional[list[dict]]:
-        if self._uva_rate_loaded:
-            return self._uva_rate_history
+        cached_data = self._get_cached_data('uva_rate_history')
+        if cached_data is not None:
+            return cached_data
 
         try:
+            one_year_ago = (date.today() - timedelta(days=365)).isoformat()
             response = requests.get(
                 f'https://api.bcra.gob.ar/estadisticas/v4.0/Monetarias/{self.UVA_RATE_ID}',
-                params={'desde': '2016-01-01'},
-                headers={'Accept': 'application/json'},
-                timeout=15
+                params={'desde': one_year_ago},
+                headers=self.HEADERS,
+                timeout=self.REQUEST_TIMEOUT
             )
+
+            if response.status_code == 429:
+                logger.warning('BCRA UVA rate limit exceeded')
+                return None
+
             if response.status_code == 200:
                 data = response.json()
-                self._uva_rate_history = data.get('results', [{}])[0].get('detalle', [])
-                self._uva_rate_loaded = True
-                return self._uva_rate_history
+                history = data.get('results', [{}])[0].get('detalle', [])
+                self._set_cached_data('uva_rate_history', history)
+                return history
+
+            logger.warning(f'BCRA UVA rate API status: {response.status_code}')
+
+        except requests.Timeout:
+            logger.error('BCRA UVA rate API request timed out')
+        except requests.ConnectionError as e:
+            logger.error(f'BCRA UVA rate API connection error: {e}')
         except Exception as e:
             logger.error(f'BCRA UVA rate API error: {e}')
+
         return None
 
     def get_btc_price(self, target_date: date) -> Optional[HistoricalRate]:
@@ -149,8 +212,13 @@ class HistoricalRatesService:
                     'from': from_timestamp,
                     'to': to_timestamp,
                 },
-                timeout=15
+                headers=self.HEADERS,
+                timeout=self.REQUEST_TIMEOUT
             )
+
+            if response.status_code == 429:
+                logger.warning('CoinGecko historical rate limit exceeded')
+                return None
 
             if response.status_code == 200:
                 data = response.json()
@@ -162,10 +230,16 @@ class HistoricalRatesService:
                         date=target_date,
                         source='coingecko'
                     )
-            else:
-                logger.warning(f'CoinGecko historical API status: {response.status_code}')
+
+            logger.warning(f'CoinGecko historical API status: {response.status_code}')
+
+        except requests.Timeout:
+            logger.error('CoinGecko historical API request timed out')
+        except requests.ConnectionError as e:
+            logger.error(f'CoinGecko historical API connection error: {e}')
         except Exception as e:
             logger.error(f'CoinGecko historical API error: {e}')
+
         return None
 
     def _find_closest_date(
@@ -174,7 +248,6 @@ class HistoricalRatesService:
         target_date: date,
         prefer_before: bool = True
     ) -> Optional[dict]:
-        target_str = target_date.isoformat()
         closest_before = None
         closest_after = None
 
@@ -186,7 +259,7 @@ class HistoricalRatesService:
             try:
                 entry_date_obj = date.fromisoformat(entry_date)
                 closest_before_date = (
-                    date.fromisoformat(closest_before['date']) 
+                    date.fromisoformat(closest_before['date'])
                     if closest_before else None
                 )
                 if entry_date_obj <= target_date:
