@@ -26,16 +26,20 @@ class InflationService:
     def get_inflation(self) -> Optional[InflationData]:
         try:
             response = requests.get(
-                f'{self.BASE_URL}/inflacion',
+                f'{self.BASE_URL}/finanzas/indices/inflacion',
                 timeout=10
             )
             if response.status_code == 200:
                 data = response.json()
-                return InflationData(
-                    monthly_rate=data.get('mensual', 0) / 100,
-                    annual_rate=data.get('anual', 0) / 100,
-                    source='argentinadatos'
-                )
+                if data and len(data) > 0:
+                    latest = data[-1]
+                    monthly_rate = float(latest.get('valor', 0)) / 100
+                    annual_rate = monthly_rate * 12
+                    return InflationData(
+                        monthly_rate=monthly_rate,
+                        annual_rate=annual_rate,
+                        source='argentinadatos'
+                    )
             else:
                 logger.warning(
                     f'Inflation API returned status {response.status_code}'

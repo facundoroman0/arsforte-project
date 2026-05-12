@@ -1,5 +1,5 @@
 """
-Servicio para obtener datos del UVA desde el BCRA.
+Servicio para obtener datos del UVA desde Argentina Datos.
 """
 import logging
 import requests
@@ -18,7 +18,7 @@ class UVAData:
 
 
 class BCRAService:
-    BASE_URL = 'https://api.bcra.gob.ar/api/v1'
+    BASE_URL = 'https://api.argentinadatos.com/v1'
     DEFAULT_PRICE = 390.0
     DEFAULT_RATE = 0.03
 
@@ -26,24 +26,27 @@ class BCRAService:
     def get_uva_data(self) -> Optional[UVAData]:
         try:
             response = requests.get(
-                f'{self.BASE_URL}/uvas',
+                f'{self.BASE_URL}/finanzas/indices/uva',
                 timeout=10
             )
             if response.status_code == 200:
                 data = response.json()
-                return UVAData(
-                    uva_price=data.get('valor', self.DEFAULT_PRICE),
-                    nominal_rate=self.DEFAULT_RATE,
-                    source='bcra'
-                )
+                if data and len(data) > 0:
+                    latest = data[-1]
+                    uva_price = float(latest.get('valor', self.DEFAULT_PRICE))
+                    return UVAData(
+                        uva_price=uva_price,
+                        nominal_rate=self.DEFAULT_RATE,
+                        source='argentinadatos'
+                    )
             else:
-                logger.warning(f'BCRA API returned status {response.status_code}')
+                logger.warning(f'UVA API returned status {response.status_code}')
         except requests.Timeout:
-            logger.error('BCRA API request timed out')
+            logger.error('UVA API request timed out')
         except requests.ConnectionError as e:
-            logger.error(f'BCRA API connection error: {e}')
+            logger.error(f'UVA API connection error: {e}')
         except Exception as e:
-            logger.error(f'BCRA API unexpected error: {e}')
+            logger.error(f'UVA API unexpected error: {e}')
         return self._get_default_uva()
 
     def _get_default_uva(self) -> UVAData:
