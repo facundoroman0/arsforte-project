@@ -22,27 +22,6 @@ body {
   min-height: 100vh;
 }
 
-/* Botones redondeados con transición */
-/*.btn-outline-light.rounded-pill {
-  border-radius: 50px;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  border-color: rgba(255, 255, 255, 0.3);
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.btn-outline-light.rounded-pill:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.5);
-  color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.btn-outline-light.rounded-pill:active {
-  transform: translateY(0);
-}*/
-
 /* Glass - UNA clase reutilizable */
 .glass {
   background: var(--glass-bg);

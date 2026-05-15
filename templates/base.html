@@ -43,7 +43,7 @@
     {% endif %}
 
     {% if messages %}
-      <div class="position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+      <div class="position-fixed top-3 end-0 p-3" style="z-index: 9999;">
         {% for message in messages %}
           <div class="alert glass alert-{{ message.tags }} alert-dismissible fade show" role="alert">
             {{ message }}
