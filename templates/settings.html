@@ -26,7 +26,7 @@
               id="id_threshold" 
               min="10" 
               max="90" 
-              value="{{ user.notification_threshold }}"
+              value="{{ user.notification_threshold|floatformat:0 }}"
               class="form-range"
             >
           </div>

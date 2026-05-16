@@ -52,6 +52,14 @@
             {% endif %}
           </div>
 
+          {% if form.non_field_errors %}
+            <div class="alert glass badge-glass-danger mb-3">
+              {% for error in form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+          {% endif %}
+
           <button type="submit" class="btn btn-outline-light rounded-pill w-100">
             Iniciar Sesión
           </button>
