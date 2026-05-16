@@ -22,27 +22,6 @@ body {
   min-height: 100vh;
 }
 
-/* Botones redondeados con transición */
-/*.btn-outline-light.rounded-pill {
-  border-radius: 50px;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  border-color: rgba(255, 255, 255, 0.3);
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.btn-outline-light.rounded-pill:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.5);
-  color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.btn-outline-light.rounded-pill:active {
-  transform: translateY(0);
-}*/
-
 /* Glass - UNA clase reutilizable */
 .glass {
   background: var(--glass-bg);
@@ -72,26 +51,29 @@ body {
   height: 56px;
 }
 
-/* Navbar items */
-.navbar .btn {
-  background: transparent;
-  border: 1px solid transparent;
-  color: rgba(255, 255, 255, 0.7);
-  padding: 0.4rem 0.8rem;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
+.nav-item {
+  border-radius: 6px;
+  transition: background 0.3s ease-in-out;
+
 }
 
-.navbar .btn:hover {
+.nav-item:hover {
   background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
 }
 
-.navbar .btn:active {
-  background: rgba(52, 209, 191, 0.15);
-  color: var(--color-cyan);
+.nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  display: block;
+  text-align: left;
 }
+
+.nav-link:hover {
+  color: var(--color-cyan);
+  background: rgba(52, 209, 191, 0.1);
+}
+
 
 .form-control.glass,
 .form-select.glass {
@@ -187,4 +169,44 @@ body {
 
 .table.glass tbody tr:hover {
   background: rgba(255, 255, 255, 0.03);
+}
+
+/* Hamburger menu - Custom button */
+.menu-toggle-btn {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  padding: 0.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Navbar collapse glass */
+.navbar-collapse {
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 767px) {
+  .navbar-collapse {
+    /*background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);*/
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    /*box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);*/
+  }
+
+  .navbar-collapse .navbar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
 }
